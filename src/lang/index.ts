@@ -47,6 +47,8 @@ import videoSubtitleEnUS from "../pages/Apps/VideoSubtitle/lang/en-US.json";
 import videoSubtitleZhCN from "../pages/Apps/VideoSubtitle/lang/zh-CN.json";
 import videoZoomEnUS from "../pages/Apps/VideoZoom/lang/en-US.json";
 import videoZoomZhCN from "../pages/Apps/VideoZoom/lang/zh-CN.json";
+import textCutVideoEnUS from "../pages/Apps/TextCutVideo/lang/en-US.json";
+import textCutVideoZhCN from "../pages/Apps/TextCutVideo/lang/zh-CN.json";
 
 let localeInit = false;
 export const defaultLocale = "zh-CN";
@@ -77,6 +79,7 @@ export const messageList = [
             ...videoSpeedPartEnUS,
             ...videoSubtitleEnUS,
             ...videoZoomEnUS,
+            ...textCutVideoEnUS,
         },
     },
     {
@@ -104,6 +107,7 @@ export const messageList = [
             ...videoSpeedPartZhCN,
             ...videoSubtitleZhCN,
             ...videoZoomZhCN,
+            ...textCutVideoZhCN,
         },
     },
 ];
