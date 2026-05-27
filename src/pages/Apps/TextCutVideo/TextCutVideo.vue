@@ -210,6 +210,15 @@ const onInvertSelection = () => {
     segments.value.forEach((s) => (s.include = !s.include));
 };
 
+const highlightText = (text: string, keyword: string): string => {
+    if (!keyword.trim() || !text) return text;
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return text.replace(
+        new RegExp(`(${escaped})`, "gi"),
+        '<mark class="bg-yellow-200 text-yellow-900 rounded px-0.5">$1</mark>',
+    );
+};
+
 const onOpenFile = async (file: string) => {
     await $mapi.file.openFile(file);
 };
@@ -389,9 +398,8 @@ const onSaveFile = async (file: string) => {
                         class="text-sm mt-1 cursor-pointer select-none"
                         :class="item.seg.include ? 'text-gray-800' : 'text-gray-400 line-through'"
                         @click="onTextClick(item.seg)"
-                    >
-                        {{ item.seg.text || $t("common.emptySegment") }}
-                    </div>
+                        v-html="highlightText(item.seg.text || $t('common.emptySegment'), searchKeyword)"
+                    ></div>
                 </div>
             </div>
 
