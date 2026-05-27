@@ -27,13 +27,11 @@ export const textCutVideoMerge = async (
         );
     }
 
-    const videoInputs = includeSegments.map((_, i) => `[v${i}]`).join("");
-    const audioInputs = includeSegments.map((_, i) => `[a${i}]`).join("");
+    const concatInputs = includeSegments
+        .map((_, i) => `[v${i}][a${i}]`)
+        .join("");
     filterParts.push(
-        `${videoInputs}concat=n=${includeSegments.length}:v=1:a=0[outv]`,
-    );
-    filterParts.push(
-        `${audioInputs}concat=n=${includeSegments.length}:v=0:a=1[outa]`,
+        `${concatInputs}concat=n=${includeSegments.length}:v=1:a=1[outv][outa]`,
     );
 
     ffmpegArgs.push("-filter_complex", filterParts.join(";"));
@@ -62,11 +60,16 @@ export const textCutVideoSeparate = async (
         const seg = includeSegments[i];
         const outputFile = await $mapi.file.temp("mp4");
         const ffmpegArgs: string[] = [
-            "-i", videoPath,
-            "-ss", (seg.start / 1000).toString(),
-            "-to", (seg.end / 1000).toString(),
-            "-c", "copy",
-            "-y", outputFile,
+            "-i",
+            videoPath,
+            "-ss",
+            (seg.start / 1000).toString(),
+            "-to",
+            (seg.end / 1000).toString(),
+            "-c",
+            "copy",
+            "-y",
+            outputFile,
         ];
         await ffmpegOptimized(ffmpegArgs, { successFileCheck: outputFile });
         files.push(outputFile);
