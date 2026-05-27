@@ -375,7 +375,7 @@ const onSaveFile = async (file: string) => {
                             class="mr-2 flex-shrink-0"
                         />
                         <div
-                            class="text-xs text-gray-500 font-mono select-none cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
+                            class="text-xs text-gray-500 font-mono cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
                             @click="onTimestampClick(item.seg)"
                         >
                             {{ TimeUtil.secondsToTime(item.seg.startSeconds, true) }}
