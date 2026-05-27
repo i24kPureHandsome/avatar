@@ -110,6 +110,28 @@ export default defineConfig(({command}) => {
                         return result;
                     },
                 },
+                configureServer(server: any) {
+                    server.middlewares.use((req: any, res: any, next: any) => {
+                        if (req.url === "/splash.html") {
+                            const splashPath = path.resolve(__dirname, "public/splash.html");
+                            if (fs.existsSync(splashPath)) {
+                                let html = fs.readFileSync(splashPath, "utf-8");
+                                const replacements = {
+                                    ...AppConfig,
+                                    version: pkg.version,
+                                };
+                                for (const key of Object.keys(replacements)) {
+                                    const val = String(replacements[key as keyof typeof replacements] || "");
+                                    html = html.replace(new RegExp(`%${key}%`, "g"), val);
+                                }
+                                res.setHeader("Content-Type", "text/html");
+                                res.end(html);
+                                return;
+                            }
+                        }
+                        next();
+                    });
+                },
                 closeBundle() {
                     const files = [
                         "splash.html",
