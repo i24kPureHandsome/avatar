@@ -95,6 +95,15 @@ export default defineConfig(({command}) => {
             },
             {
                 name: "process-variables",
+                transformIndexHtml: {
+                    enforce: "pre",
+                    transform(html: string) {
+                        for (const key in AppConfig) {
+                            html = html.replace(new RegExp(`%${key}%`, "g"), AppConfig[key]);
+                        }
+                        return html;
+                    },
+                },
                 closeBundle() {
                     const files = [
                         "splash.html",
