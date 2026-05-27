@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from "vue";
 import FeedbackTicketButton from "../components/common/FeedbackTicketButton.vue";
+import { AppConfig } from "../config";
 
 import { TimeUtil } from "../lib/util";
 import { TaskService } from "../service/TaskService";
@@ -84,7 +85,7 @@ onMounted(async () => {
             <div
                 class="text-2xl font-bold flex-grow text-gray-800 dark:text-gray-100"
             >
-                {{ $t("welcome.title") }}
+                {{ $t("welcome.title", { appName: AppConfig.title }) }}
             </div>
             <a
                 target="_blank"
