@@ -1,48 +1,50 @@
 import { t } from "../../../lang";
-import { ffmpegOptimized } from "../../../lib/ffmpeg";
+import { ffmpegConcatVideos, ffmpegOptimized } from "../../../lib/ffmpeg";
 import { TextCutVideoSegment } from "./type";
 
 export const textCutVideoMerge = async (
     videoPath: string,
     segments: TextCutVideoSegment[],
 ): Promise<string> => {
-    const outputFile = await $mapi.file.temp("mp4");
-
     const includeSegments = segments.filter((seg) => seg.include);
 
     if (includeSegments.length === 0) {
         throw new Error(t("error.noSegmentSelected"));
     }
 
-    let ffmpegArgs: string[] = ["-i", videoPath];
-
-    const filterParts: string[] = [];
-    for (let i = 0; i < includeSegments.length; i++) {
-        const seg = includeSegments[i];
-        filterParts.push(
-            `[0:v]trim=start=${seg.start / 1000}:end=${seg.end / 1000},setpts=PTS-STARTPTS[v${i}]`,
+    if (includeSegments.length === 1) {
+        const seg = includeSegments[0];
+        const outputFile = await $mapi.file.temp("mp4");
+        await ffmpegOptimized(
+            [
+                "-i", videoPath,
+                "-ss", (seg.start / 1000).toString(),
+                "-to", (seg.end / 1000).toString(),
+                "-c", "copy",
+                "-y", outputFile,
+            ],
+            { successFileCheck: outputFile },
         );
-        filterParts.push(
-            `[0:a]atrim=start=${seg.start / 1000}:end=${seg.end / 1000},asetpts=PTS-STARTPTS[a${i}]`,
-        );
+        return outputFile;
     }
 
-    const concatInputs = includeSegments
-        .map((_, i) => `[v${i}][a${i}]`)
-        .join("");
-    filterParts.push(
-        `${concatInputs}concat=n=${includeSegments.length}:v=1:a=1[outv][outa]`,
-    );
+    const clipFiles: string[] = [];
+    for (const seg of includeSegments) {
+        const clipFile = await $mapi.file.temp("mp4");
+        await ffmpegOptimized(
+            [
+                "-i", videoPath,
+                "-ss", (seg.start / 1000).toString(),
+                "-to", (seg.end / 1000).toString(),
+                "-c", "copy",
+                "-y", clipFile,
+            ],
+            { successFileCheck: clipFile },
+        );
+        clipFiles.push(clipFile);
+    }
 
-    ffmpegArgs.push("-filter_complex", filterParts.join(";"));
-    ffmpegArgs.push("-map", "[outv]", "-map", "[outa]");
-    ffmpegArgs.push("-c:v", "libx264", "-preset", "ultrafast", "-crf", "0");
-    ffmpegArgs.push("-c:a", "aac");
-    ffmpegArgs.push("-y", outputFile);
-
-    await ffmpegOptimized(ffmpegArgs, { successFileCheck: outputFile });
-
-    return outputFile;
+    return await ffmpegConcatVideos(clipFiles);
 };
 
 export const textCutVideoSeparate = async (
