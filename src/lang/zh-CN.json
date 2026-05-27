@@ -352,6 +352,7 @@
     "welcome.title": "欢迎使用 {appName} !",
     "setting.brandName": "品牌名称",
     "setting.brandTitle": "品牌标题",
+    "setting.brandChangeTip": "修改后需重启应用生效",
     "common.clear": "清空",
     "common.clickToAdd": "点击添加",
     "common.clickToSelect": "点击选择",

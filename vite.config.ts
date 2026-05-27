@@ -8,7 +8,7 @@ import electron from "vite-plugin-electron";
 import renderer from "vite-plugin-electron-renderer";
 import pkg from "./package.json";
 import path from "node:path";
-import {AppConfig, BrandDefaults} from "./src/config";
+import {AppConfig} from "./src/config";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -21,6 +21,20 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 // https://vitejs.dev/config/
+function replaceHtmlPlaceholders(html: string): string {
+    let result = html;
+    const replacements: Record<string, any> = {
+        ...AppConfig,
+        version: pkg.version,
+    };
+    for (const key of Object.keys(replacements)) {
+        const val = replacements[key];
+        if (typeof val !== "string" && typeof val !== "number") continue;
+        result = result.replace(new RegExp(`%${key}%`, "g"), String(val));
+    }
+    return result;
+}
+
 export default defineConfig(({command}) => {
     fs.rmSync("dist-electron", {recursive: true, force: true});
 
@@ -98,16 +112,7 @@ export default defineConfig(({command}) => {
                 transformIndexHtml: {
                     order: "pre" as const,
                     handler(html: string) {
-                        let result = html;
-                        const replacements = {
-                            ...AppConfig,
-                            version: pkg.version,
-                        };
-                        for (const key of Object.keys(replacements)) {
-                            const val = String(replacements[key as keyof typeof replacements] || "");
-                            result = result.replace(new RegExp(`%${key}%`, "g"), val);
-                        }
-                        return result;
+                        return replaceHtmlPlaceholders(html);
                     },
                 },
                 configureServer(server: any) {
@@ -115,17 +120,9 @@ export default defineConfig(({command}) => {
                         if (req.url === "/splash.html") {
                             const splashPath = path.resolve(__dirname, "public/splash.html");
                             if (fs.existsSync(splashPath)) {
-                                let html = fs.readFileSync(splashPath, "utf-8");
-                                const replacements = {
-                                    ...AppConfig,
-                                    version: pkg.version,
-                                };
-                                for (const key of Object.keys(replacements)) {
-                                    const val = String(replacements[key as keyof typeof replacements] || "");
-                                    html = html.replace(new RegExp(`%${key}%`, "g"), val);
-                                }
+                                const html = fs.readFileSync(splashPath, "utf-8");
                                 res.setHeader("Content-Type", "text/html");
-                                res.end(html);
+                                res.end(replaceHtmlPlaceholders(html));
                                 return;
                             }
                         }
@@ -150,15 +147,8 @@ export default defineConfig(({command}) => {
                         if(!fs.existsSync(p)) {
                             return;
                         }
-                        let html = fs.readFileSync(p, "utf-8");
-                        const replacements = {
-                            ...AppConfig,
-                            version: pkg.version,
-                        };
-                        for (const key of Object.keys(replacements)) {
-                            html = html.replace(new RegExp(`%${key}%`, "g"), String(replacements[key as keyof typeof replacements] || ""));
-                        }
-                        fs.writeFileSync(p, html, "utf-8");
+                        const html = fs.readFileSync(p, "utf-8");
+                        fs.writeFileSync(p, replaceHtmlPlaceholders(html), "utf-8");
                     });
                 },
             },
