@@ -125,7 +125,6 @@ const doUser = async () => {
                 <div class="text-sm">直播</div>
             </a>
             /隐藏：直播菜单 -->
-            <!-- 隐藏：小工具菜单
             <a
                 class="page-nav-item block text-center py-3"
                 :class="activeTab === 'tool' ? 'active' : ''"
@@ -137,7 +136,6 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">小工具</div>
             </a>
-            /隐藏：小工具菜单 -->
             <!-- 隐藏：工作流菜单
             <a
                 class="page-nav-item block text-center py-3"
