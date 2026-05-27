@@ -8,7 +8,7 @@ import electron from "vite-plugin-electron";
 import renderer from "vite-plugin-electron-renderer";
 import pkg from "./package.json";
 import path from "node:path";
-import {AppConfig} from "./src/config";
+import {AppConfig, BrandDefaults} from "./src/config";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -96,12 +96,18 @@ export default defineConfig(({command}) => {
             {
                 name: "process-variables",
                 transformIndexHtml: {
-                    order: "pre",
+                    order: "pre" as const,
                     handler(html: string) {
-                        for (const key in AppConfig) {
-                            html = html.replace(new RegExp(`%${key}%`, "g"), AppConfig[key]);
+                        let result = html;
+                        const replacements = {
+                            ...AppConfig,
+                            version: pkg.version,
+                        };
+                        for (const key of Object.keys(replacements)) {
+                            const val = String(replacements[key as keyof typeof replacements] || "");
+                            result = result.replace(new RegExp(`%${key}%`, "g"), val);
                         }
-                        return html;
+                        return result;
                     },
                 },
                 closeBundle() {
@@ -123,8 +129,12 @@ export default defineConfig(({command}) => {
                             return;
                         }
                         let html = fs.readFileSync(p, "utf-8");
-                        for (const key in AppConfig) {
-                            html = html.replace(new RegExp(`%${key}%`, "g"), AppConfig[key]);
+                        const replacements = {
+                            ...AppConfig,
+                            version: pkg.version,
+                        };
+                        for (const key of Object.keys(replacements)) {
+                            html = html.replace(new RegExp(`%${key}%`, "g"), String(replacements[key as keyof typeof replacements] || ""));
                         }
                         fs.writeFileSync(p, html, "utf-8");
                     });

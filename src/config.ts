@@ -5,12 +5,13 @@ const BASE_URL = "https://aigcpanel.com";
 export const BrandDefaults = {
     name: "AI-AVATAR",
     title: "AI-AVATAR",
+    slogan: "一站式AI数字人系统",
 };
 
 export const AppConfig = {
     name: BrandDefaults.name,
     title: BrandDefaults.title,
-    slogan: "一站式AI数字人系统",
+    slogan: BrandDefaults.slogan,
     version: packageJson.version,
     website: `${BASE_URL}`,
     websiteGithub: "https://github.com/modstart-lib/aigcpanel",
