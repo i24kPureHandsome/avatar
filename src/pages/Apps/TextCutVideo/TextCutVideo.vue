@@ -253,14 +253,34 @@ const onInvertSelection = () => {
 };
 
 const doSmartMerge = async () => {
-    const selectorEl = modelSelectorRef.value;
-    if (!selectorEl) return;
-    const modelValue = selectorEl.modelValue || selectorEl.$refs?.select?.modelValue;
-    if (!modelValue) {
+    const selectorComp = modelSelectorRef.value;
+    if (!selectorComp) {
         Dialog.tipError("请先选择 AI 模型");
         return;
     }
-    const [providerId, modelId] = modelValue.split("|");
+    const info = selectorComp.getInfo?.();
+    if (!info?.providerTitle || !info?.modelName) {
+        Dialog.tipError("请先选择 AI 模型");
+        return;
+    }
+    let providerId = "";
+    let modelId = "";
+    for (const p of modelStore.providers) {
+        if (p.title === info.providerTitle) {
+            providerId = p.id;
+            for (const m of p.data.models) {
+                if (m.name === info.modelName) {
+                    modelId = m.id;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if (!providerId || !modelId) {
+        Dialog.tipError("未找到对应模型配置");
+        return;
+    }
 
     const lines = segments.value.map(
         (seg, i) => `[${i}] ${seg.text}`,
