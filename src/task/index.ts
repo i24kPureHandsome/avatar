@@ -69,6 +69,10 @@ import {
     VideoSubtitleCleaner,
 } from "../pages/Apps/VideoSubtitle/task";
 import { VideoZoom, VideoZoomCleaner } from "../pages/Apps/VideoZoom/task";
+import {
+    TextCutVideo,
+    TextCutVideoCleaner,
+} from "../pages/Apps/TextCutVideo/task";
 import { TaskService } from "../service/TaskService";
 
 import { useServerStore } from "../store/modules/server";
@@ -110,6 +114,7 @@ export const tasks = {
     VideoMerge,
     MediaFormatConvert,
     Ffmpeg,
+    TextCutVideo,
 };
 
 export const taskCleaners = {
@@ -137,6 +142,7 @@ export const taskCleaners = {
     VideoMerge: VideoMergeCleaner,
     MediaFormatConvert: MediaFormatConvertCleaner,
     Ffmpeg: FfmpegCleaner,
+    TextCutVideo: TextCutVideoCleaner,
 };
 
 export const TaskManager = {
