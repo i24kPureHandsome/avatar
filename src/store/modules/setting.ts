@@ -50,6 +50,7 @@ export const settingStore = defineStore("setting", {
             (async () => {
                 // console.log('onConfigChangeBroadcast', data)
                 this.config = await window.$mapi.config.all();
+                initAppBrand(this.config);
                 this.setupDarkMode();
             })();
         },

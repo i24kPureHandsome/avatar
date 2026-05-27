@@ -30,7 +30,7 @@ function replaceHtmlPlaceholders(html: string): string {
     for (const key of Object.keys(replacements)) {
         const val = replacements[key];
         if (typeof val !== "string" && typeof val !== "number") continue;
-        result = result.replace(new RegExp(`%${key}%`, "g"), String(val));
+        result = result.replaceAll(`%${key}%`, String(val));
     }
     return result;
 }
@@ -117,7 +117,7 @@ export default defineConfig(({command}) => {
                 },
                 configureServer(server: any) {
                     server.middlewares.use((req: any, res: any, next: any) => {
-                        if (req.url === "/splash.html") {
+                        if ((req.url || "").split("?")[0] === "/splash.html") {
                             const splashPath = path.resolve(__dirname, "public/splash.html");
                             if (fs.existsSync(splashPath)) {
                                 const html = fs.readFileSync(splashPath, "utf-8");
