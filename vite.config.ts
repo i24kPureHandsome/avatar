@@ -96,8 +96,8 @@ export default defineConfig(({command}) => {
             {
                 name: "process-variables",
                 transformIndexHtml: {
-                    enforce: "pre",
-                    transform(html: string) {
+                    order: "pre",
+                    handler(html: string) {
                         for (const key in AppConfig) {
                             html = html.replace(new RegExp(`%${key}%`, "g"), AppConfig[key]);
                         }
