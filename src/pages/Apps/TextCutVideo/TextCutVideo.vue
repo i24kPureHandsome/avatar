@@ -261,17 +261,24 @@ const doSmartMerge = async () => {
     const lines = segments.value.map(
         (seg, i) => `[${i}] ${seg.text}`,
     );
-    const prompt = `以下是语音识别产生的文字片段，按顺序排列。部分片段可能在语义不完整的地方被截断，需要合并相邻片段才能形成完整句子。
+    const prompt = `以下是语音识别(ASR)产生的文字片段，按顺序排列，每个片段有序号。由于ASR断句不精确，部分片段存在以下问题：
+1. 语义不完整的地方被截断（比如"抢单"和"第四招人留人"应该是"抢单。第四招人留人"）
+2. 不该断开的地方被断开了
+3. 缺少标点符号导致语义不清
 
-请分析以下片段，找出需要合并的相邻片段。返回 JSON 格式的合并指令。
+请重新组织这些片段，将语义被截断的相邻片段合并，并添加正确的标点符号。
 
 规则：
-1. 只合并语义被截断的相邻片段
-2. 不要改变文字内容
-3. 不需要合并的片段不要列出
-4. 返回格式：{"merges": [[起始序号, 结束序号], ...]}
+1. 每个结果片段必须包含一个或多个连续的原始片段（用 sourceIndexes 指定）
+2. sourceIndexes 必须是连续的整数
+3. 修正后的文字(text)需要添加正确的标点符号
+4. 不要遗漏任何原始片段，所有片段都必须被包含
+5. 不要改变文字的实质内容，只修正断句和标点
 
-片段列表：
+返回格式：
+{"segments": [{"sourceIndexes": [0], "text": "修正后的文字。"}, {"sourceIndexes": [1, 2, 3], "text": "修正后的文字。"}]}
+
+原始片段列表：
 ${lines.join("\n")}
 
 请只返回 JSON，不要其他内容。`;
@@ -279,7 +286,7 @@ ${lines.join("\n")}
     smartMerging.value = true;
     try {
         const result = await modelStore.chat(providerId, modelId, prompt, {
-            systemPrompt: "你是一个专业的文字编辑助手。只返回 JSON 格式的结果，不要包含任何其他文字。",
+            systemPrompt: "你是一个专业的中文文字编辑助手，擅长修正语音识别结果的断句和标点。只返回 JSON 格式的结果，不要包含任何其他文字。",
         });
         if (result.code !== 0 || !result.data?.content) {
             Dialog.tipError("AI 模型调用失败: " + (result.msg || "无响应"));
@@ -288,6 +295,11 @@ ${lines.join("\n")}
         }
 
         let content = result.data.content.trim();
+        if (/^```json/.test(content)) {
+            content = content.replace(/^```json/, "").replace(/```$/, "").trim();
+        } else if (/^```/.test(content)) {
+            content = content.replace(/^```/, "").replace(/```$/, "").trim();
+        }
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
             Dialog.tipError("AI 返回格式异常");
@@ -296,53 +308,38 @@ ${lines.join("\n")}
         }
 
         const parsed = JSON.parse(jsonMatch[0]);
-        const merges: number[][] = parsed.merges || [];
+        const newSegs: { sourceIndexes: number[]; text: string }[] = parsed.segments || [];
 
-        if (merges.length === 0) {
-            Dialog.tipSuccess("AI 分析完成，无需合并");
+        if (newSegs.length === 0) {
+            Dialog.tipSuccess("AI 分析完成，无需调整");
             smartMerging.value = false;
             return;
         }
 
-        const mergeSet = new Set<number>();
-        const groups: number[][] = [];
-        for (const [start, end] of merges) {
-            const group: number[] = [];
-            for (let i = start; i <= end; i++) {
-                if (!mergeSet.has(i)) {
-                    mergeSet.add(i);
-                    group.push(i);
-                }
-            }
-            if (group.length > 1) groups.push(group);
+        const allIndexes = newSegs.flatMap((s) => s.sourceIndexes);
+        const uniqueCount = new Set(allIndexes).size;
+        if (uniqueCount !== segments.value.length) {
+            Dialog.tipError("AI 返回结果不完整，请重试");
+            smartMerging.value = false;
+            return;
         }
 
         const newSegments: (TextCutVideoSegment & { startSeconds: number; endSeconds: number })[] = [];
-        let i = 0;
-        while (i < segments.value.length) {
-            if (mergeSet.has(i)) {
-                const group = groups.find((g) => g.includes(i));
-                if (group) {
-                    const first = segments.value[group[0]];
-                    const last = segments.value[group[group.length - 1]];
-                    newSegments.push({
-                        start: first.start,
-                        end: last.end,
-                        text: group.map((idx) => segments.value[idx].text).join(""),
-                        include: true,
-                        startSeconds: first.startSeconds,
-                        endSeconds: last.endSeconds,
-                    });
-                    i = group[group.length - 1] + 1;
-                    continue;
-                }
-            }
-            newSegments.push({ ...segments.value[i] });
-            i++;
+        for (const seg of newSegs) {
+            const first = segments.value[seg.sourceIndexes[0]];
+            const last = segments.value[seg.sourceIndexes[seg.sourceIndexes.length - 1]];
+            newSegments.push({
+                start: first.start,
+                end: last.end,
+                text: seg.text,
+                include: true,
+                startSeconds: first.startSeconds,
+                endSeconds: last.endSeconds,
+            });
         }
 
         segments.value = newSegments;
-        Dialog.tipSuccess(`智能断句完成，合并了 ${merges.length} 处片段`);
+        Dialog.tipSuccess(`智能断句完成，${segments.value.length} → ${newSegments.length} 个片段`);
     } catch (e: any) {
         Dialog.tipError("智能断句失败: " + String(e));
     }
