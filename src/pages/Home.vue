@@ -409,8 +409,7 @@ onMounted(async () => {
         </div>
         /隐藏：模型市场和工单反馈 -->
 
-        <!-- 隐藏：小工具区
-        小工具功能卡片
+        <!-- 小工具功能卡片 -->
         <div
             class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-5 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
             data-auto-test-id="home-tool-apps"
@@ -465,7 +464,6 @@ onMounted(async () => {
                 </div>
             </div>
         </div>
-        /隐藏：小工具区 -->
     </div>
 </template>
 
