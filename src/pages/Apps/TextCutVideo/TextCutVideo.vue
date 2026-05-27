@@ -198,6 +198,43 @@ const onTimestampClick = (seg: TextCutVideoSegment & { startSeconds: number; end
     }
 };
 
+const mouseDownPos = ref<{ x: number; y: number } | null>(null);
+const mouseDownTarget = ref<"row" | "timestamp" | null>(null);
+
+const onRowMouseDown = (e: MouseEvent) => {
+    mouseDownPos.value = { x: e.clientX, y: e.clientY };
+    mouseDownTarget.value = "row";
+};
+
+const onRowMouseUp = (e: MouseEvent, seg: TextCutVideoSegment) => {
+    if (!mouseDownPos.value) return;
+    const dx = Math.abs(e.clientX - mouseDownPos.value.x);
+    const dy = Math.abs(e.clientY - mouseDownPos.value.y);
+    mouseDownPos.value = null;
+    const target = mouseDownTarget.value;
+    mouseDownTarget.value = null;
+    if (dx < 5 && dy < 5 && target === "row") {
+        seg.include = !seg.include;
+    }
+};
+
+const onTimestampMouseDown = (e: MouseEvent) => {
+    mouseDownPos.value = { x: e.clientX, y: e.clientY };
+    mouseDownTarget.value = "timestamp";
+};
+
+const onTimestampMouseUp = (e: MouseEvent, seg: TextCutVideoSegment & { startSeconds: number; endSeconds: number }) => {
+    if (!mouseDownPos.value) return;
+    const dx = Math.abs(e.clientX - mouseDownPos.value.x);
+    const dy = Math.abs(e.clientY - mouseDownPos.value.y);
+    mouseDownPos.value = null;
+    const target = mouseDownTarget.value;
+    mouseDownTarget.value = null;
+    if (dx < 5 && dy < 5 && target === "timestamp") {
+        onTimestampClick(seg);
+    }
+};
+
 const onTextClick = (seg: TextCutVideoSegment) => {
     seg.include = !seg.include;
 };
@@ -360,12 +397,14 @@ const onSaveFile = async (file: string) => {
                     :key="item.index"
                     :data-segment-index="item.index"
                     :class="[
-                        'border-b p-2 hover:bg-gray-50 cursor-default',
+                        'border-b p-2 hover:bg-gray-50',
                         item.index === currentIndex ? 'bg-blue-50' : '',
                         item.matched === false && searchKeyword.trim()
                             ? 'opacity-40'
                             : '',
                     ]"
+                    @mousedown="onRowMouseDown($event)"
+                    @mouseup="onRowMouseUp($event, item.seg)"
                 >
                     <div class="flex items-center">
                         <a-checkbox
@@ -376,7 +415,8 @@ const onSaveFile = async (file: string) => {
                         />
                         <div
                             class="text-xs text-gray-500 font-mono cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
-                            @click="onTimestampClick(item.seg)"
+                            @mousedown.stop="onTimestampMouseDown($event)"
+                            @mouseup.stop="onTimestampMouseUp($event, item.seg)"
                         >
                             {{ TimeUtil.secondsToTime(item.seg.startSeconds, true) }}
                             -
@@ -395,7 +435,7 @@ const onSaveFile = async (file: string) => {
                         </a-tag>
                     </div>
                     <div
-                        class="text-sm mt-1 select-text"
+                        class="text-sm mt-1"
                         :class="item.seg.include ? 'text-gray-800' : 'text-gray-400 line-through'"
                         v-html="highlightText(item.seg.text || $t('common.emptySegment'), searchKeyword)"
                     ></div>
