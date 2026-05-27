@@ -156,6 +156,16 @@ export const VideoProcessingApps = [
         ),
     },
     {
+        name: "TextCutVideo",
+        title: "文本剪辑视频",
+        description: "通过语音识别提取视频文字内容，支持搜索定位、勾选剪辑",
+        icon: TextCutVideoIcon,
+        color: "#8b5cf6",
+        component: defineAsyncComponent(
+            () => import("./TextCutVideo/TextCutVideo.vue"),
+        ),
+    },
+    {
         name: "VideoZoom",
         title: "视频片段放大",
         description: "放大视频片段，便于查看细节，支持快速操作。",
