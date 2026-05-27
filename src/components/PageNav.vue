@@ -38,6 +38,7 @@ const doUser = async () => {
     <div
         class="flex flex-col h-full border-r border-gray-200 dark:border-gray-600"
     >
+        <!-- 隐藏：个人头像
         <div
             class="py-4 px-3"
             :class="setting.basic.userEnable ? 'cursor-pointer' : ''"
@@ -87,6 +88,7 @@ const doUser = async () => {
                 </div>
             </div>
         </div>
+        /隐藏：个人头像 -->
         <div class="flex-grow mt-2">
             <a
                 class="page-nav-item block text-center py-3"
@@ -110,6 +112,7 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">数字人</div>
             </a>
+            <!-- 隐藏：直播菜单
             <a
                 class="page-nav-item block text-center py-3"
                 :class="activeTab === 'live' ? 'active' : ''"
@@ -121,6 +124,8 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">直播</div>
             </a>
+            /隐藏：直播菜单 -->
+            <!-- 隐藏：小工具菜单
             <a
                 class="page-nav-item block text-center py-3"
                 :class="activeTab === 'tool' ? 'active' : ''"
@@ -132,6 +137,8 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">小工具</div>
             </a>
+            /隐藏：小工具菜单 -->
+            <!-- 隐藏：工作流菜单
             <a
                 class="page-nav-item block text-center py-3"
                 :class="activeTab === 'workflow' ? 'active' : ''"
@@ -143,6 +150,7 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">工作流</div>
             </a>
+            /隐藏：工作流菜单 -->
             <a
                 class="page-nav-item block text-center py-3"
                 :class="activeTab === 'server' ? 'active' : ''"
@@ -154,6 +162,7 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">AI模型</div>
             </a>
+            <!-- 隐藏：设置菜单
             <a
                 class="page-nav-item block text-center py-3"
                 :class="activeTab === 'setting' ? 'active' : ''"
@@ -165,6 +174,7 @@ const doUser = async () => {
                 </div>
                 <div class="text-sm">{{ $t("common.setting") }}</div>
             </a>
+            /隐藏：设置菜单 -->
         </div>
         <div></div>
     </div>
