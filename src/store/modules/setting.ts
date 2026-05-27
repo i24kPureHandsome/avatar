@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import store from "../index";
-import { AppConfig } from "../../config";
+import { AppConfig, initAppBrand } from "../../config";
 import { computed } from "vue";
 import { cloneDeep } from "lodash-es";
 
@@ -25,6 +25,7 @@ export const settingStore = defineStore("setting", {
             this.isDarkMode = await window.$mapi.app.isDarkMode();
             this.config = await window.$mapi.config.all();
             this.configEnv = await window.$mapi.config.allEnv();
+            initAppBrand(this.config);
             this.setupDarkMode();
             // this.showGuideWhenReady().then()
             window.$mapi.app.getBuildInfo().then((info: any) => {
