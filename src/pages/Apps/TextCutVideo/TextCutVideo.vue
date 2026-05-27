@@ -11,8 +11,11 @@ import FileSelector from "../../../components/common/FileSelector.vue";
 import SoundAsrForm from "../../Video/components/SoundAsrForm.vue";
 import { TextCutVideoSegment } from "./type";
 import { textCutVideoMerge, textCutVideoSeparate } from "./util";
+import { useModelStore } from "../../../module/Model/store/model";
+import ModelSelector from "../../../module/Model/ModelSelector.vue";
 
 const serverStore = useServerStore();
+const modelStore = useModelStore();
 
 type Phase = "idle" | "extracting" | "recognizing" | "editing" | "exporting" | "done";
 
@@ -30,6 +33,8 @@ const searchKeyword = ref("");
 const exportMode = ref<"merge" | "separate">("merge");
 const exportFiles = ref<string[]>([]);
 const progressMsg = ref("");
+const modelSelectorRef = ref<any>(null);
+const smartMerging = ref(false);
 
 const filteredSegments = computed(() => {
     if (!searchKeyword.value.trim()) {
@@ -247,6 +252,107 @@ const onInvertSelection = () => {
     segments.value.forEach((s) => (s.include = !s.include));
 };
 
+const doSmartMerge = async () => {
+    const selectorEl = modelSelectorRef.value;
+    if (!selectorEl) return;
+    const modelValue = selectorEl.modelValue || selectorEl.$refs?.select?.modelValue;
+    if (!modelValue) {
+        Dialog.tipError("请先选择 AI 模型");
+        return;
+    }
+    const [providerId, modelId] = modelValue.split("|");
+
+    const lines = segments.value.map(
+        (seg, i) => `[${i}] ${seg.text}`,
+    );
+    const prompt = `以下是语音识别产生的文字片段，按顺序排列。部分片段可能在语义不完整的地方被截断，需要合并相邻片段才能形成完整句子。
+
+请分析以下片段，找出需要合并的相邻片段。返回 JSON 格式的合并指令。
+
+规则：
+1. 只合并语义被截断的相邻片段
+2. 不要改变文字内容
+3. 不需要合并的片段不要列出
+4. 返回格式：{"merges": [[起始序号, 结束序号], ...]}
+
+片段列表：
+${lines.join("\n")}
+
+请只返回 JSON，不要其他内容。`;
+
+    smartMerging.value = true;
+    try {
+        const result = await modelStore.chat(providerId, modelId, prompt, {
+            systemPrompt: "你是一个专业的文字编辑助手。只返回 JSON 格式的结果，不要包含任何其他文字。",
+        });
+        if (result.code !== 0 || !result.data?.content) {
+            Dialog.tipError("AI 模型调用失败: " + (result.msg || "无响应"));
+            smartMerging.value = false;
+            return;
+        }
+
+        let content = result.data.content.trim();
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            Dialog.tipError("AI 返回格式异常");
+            smartMerging.value = false;
+            return;
+        }
+
+        const parsed = JSON.parse(jsonMatch[0]);
+        const merges: number[][] = parsed.merges || [];
+
+        if (merges.length === 0) {
+            Dialog.tipSuccess("AI 分析完成，无需合并");
+            smartMerging.value = false;
+            return;
+        }
+
+        const mergeSet = new Set<number>();
+        const groups: number[][] = [];
+        for (const [start, end] of merges) {
+            const group: number[] = [];
+            for (let i = start; i <= end; i++) {
+                if (!mergeSet.has(i)) {
+                    mergeSet.add(i);
+                    group.push(i);
+                }
+            }
+            if (group.length > 1) groups.push(group);
+        }
+
+        const newSegments: (TextCutVideoSegment & { startSeconds: number; endSeconds: number })[] = [];
+        let i = 0;
+        while (i < segments.value.length) {
+            if (mergeSet.has(i)) {
+                const group = groups.find((g) => g.includes(i));
+                if (group) {
+                    const first = segments.value[group[0]];
+                    const last = segments.value[group[group.length - 1]];
+                    newSegments.push({
+                        start: first.start,
+                        end: last.end,
+                        text: group.map((idx) => segments.value[idx].text).join(""),
+                        include: true,
+                        startSeconds: first.startSeconds,
+                        endSeconds: last.endSeconds,
+                    });
+                    i = group[group.length - 1] + 1;
+                    continue;
+                }
+            }
+            newSegments.push({ ...segments.value[i] });
+            i++;
+        }
+
+        segments.value = newSegments;
+        Dialog.tipSuccess(`智能断句完成，合并了 ${merges.length} 处片段`);
+    } catch (e: any) {
+        Dialog.tipError("智能断句失败: " + String(e));
+    }
+    smartMerging.value = false;
+};
+
 const highlightText = (text: string, keyword: string): string => {
     if (!keyword.trim() || !text) return text;
     const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -381,6 +487,21 @@ const onSaveFile = async (file: string) => {
                 <a-button size="mini" @click="onToggleAll(false)">
                     {{ $t("common.deSelectAll") }}
                 </a-button>
+            </div>
+
+            <div v-if="segments.length > 0" class="p-2 border-b flex items-center gap-2">
+                <ModelSelector ref="modelSelectorRef" style="min-width: 180px" />
+                <a-button
+                    size="small"
+                    type="outline"
+                    :loading="smartMerging"
+                    @click="doSmartMerge"
+                >
+                    <icon-robot class="mr-1" />
+                    智能断句
+                </a-button>
+                <div class="flex-grow"></div>
+                <span class="text-xs text-gray-400">{{ segments.length }} 个片段</span>
             </div>
 
             <div class="flex-grow overflow-y-auto">
