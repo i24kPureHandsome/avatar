@@ -34,6 +34,11 @@ const exportFiles = ref<string[]>([]);
 const progressMsg = ref("");
 const selectedModel = ref("");
 const smartMerging = ref(false);
+const selectedIndexes = ref<number[]>([]);
+const editingIndex = ref(-1);
+const editText = ref("");
+const splitIndex = ref(-1);
+const splitText = ref("");
 
 const filteredSegments = computed(() => {
     if (!searchKeyword.value.trim()) {
@@ -346,6 +351,93 @@ ${lines.join("\n")}
     smartMerging.value = false;
 };
 
+const toggleSelect = (index: number) => {
+    const pos = selectedIndexes.value.indexOf(index);
+    if (pos >= 0) {
+        selectedIndexes.value.splice(pos, 1);
+    } else {
+        selectedIndexes.value.push(index);
+        selectedIndexes.value.sort((a, b) => a - b);
+    }
+};
+
+const canMerge = computed(() => {
+    if (selectedIndexes.value.length < 2) return false;
+    const sorted = [...selectedIndexes.value].sort((a, b) => a - b);
+    for (let i = 1; i < sorted.length; i++) {
+        if (sorted[i] !== sorted[i - 1] + 1) return false;
+    }
+    return true;
+});
+
+const doMerge = () => {
+    if (!canMerge.value) return;
+    const sorted = [...selectedIndexes.value].sort((a, b) => a - b);
+    const first = segments.value[sorted[0]];
+    const last = segments.value[sorted[sorted.length - 1]];
+    const merged = {
+        start: first.start,
+        end: last.end,
+        text: sorted.map((i) => segments.value[i].text).join(""),
+        include: true,
+        startSeconds: first.startSeconds,
+        endSeconds: last.endSeconds,
+    };
+    const newSegs = [...segments.value];
+    newSegs.splice(sorted[0], sorted.length, merged);
+    segments.value = newSegs;
+    selectedIndexes.value = [];
+};
+
+const doSplit = () => {
+    if (splitIndex.value < 0 || !splitText.value.trim()) return;
+    const seg = segments.value[splitIndex.value];
+    const splitPos = seg.text.indexOf(splitText.value);
+    if (splitPos < 0) return;
+    const ratio = seg.text.length > 0 ? splitPos / seg.text.length : 0;
+    const splitTime = seg.start + (seg.end - seg.start) * ratio;
+    const splitSeconds = seg.startSeconds + (seg.endSeconds - seg.startSeconds) * ratio;
+    const seg1 = {
+        start: seg.start,
+        end: splitTime,
+        text: seg.text.substring(0, splitPos),
+        include: seg.include,
+        startSeconds: seg.startSeconds,
+        endSeconds: splitSeconds,
+    };
+    const seg2 = {
+        start: splitTime,
+        end: seg.end,
+        text: seg.text.substring(splitPos),
+        include: seg.include,
+        startSeconds: splitSeconds,
+        endSeconds: seg.endSeconds,
+    };
+    const newSegs = [...segments.value];
+    newSegs.splice(splitIndex.value, 1, seg1, seg2);
+    segments.value = newSegs;
+    splitIndex.value = -1;
+    splitText.value = "";
+};
+
+const startEdit = (index: number) => {
+    editingIndex.value = index;
+    editText.value = segments.value[index].text;
+};
+
+const doSaveEdit = () => {
+    if (editingIndex.value >= 0) {
+        segments.value[editingIndex.value].text = editText.value;
+        editingIndex.value = -1;
+        editText.value = "";
+    }
+};
+
+const doCancelEdit = () => {
+    editingIndex.value = -1;
+    editText.value = "";
+};
+
 const highlightText = (text: string, keyword: string): string => {
     if (!keyword.trim() || !text) return text;
     const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -494,7 +586,30 @@ const onSaveFile = async (file: string) => {
                     智能断句
                 </a-button>
                 <div class="flex-grow"></div>
+                <a-button
+                    v-if="selectedIndexes.length > 0"
+                    size="mini"
+                    type="primary"
+                    :disabled="!canMerge"
+                    @click="doMerge"
+                >
+                    合并 ({{ selectedIndexes.length }})
+                </a-button>
+                <a-button
+                    v-if="selectedIndexes.length > 0"
+                    size="mini"
+                    @click="selectedIndexes = []"
+                >
+                    取消选择
+                </a-button>
                 <span class="text-xs text-gray-400">{{ segments.length }} 个片段</span>
+            </div>
+
+            <div v-if="splitIndex >= 0" class="p-2 border-b bg-yellow-50 flex items-center gap-2">
+                <span class="text-xs text-gray-600">拆分位置：</span>
+                <a-input v-model="splitText" size="mini" class="flex-grow" placeholder="输入拆分点文字" />
+                <a-button size="mini" type="primary" @click="doSplit">确认拆分</a-button>
+                <a-button size="mini" @click="splitIndex = -1; splitText = ''">取消</a-button>
             </div>
 
             <div class="flex-grow overflow-y-auto">
@@ -513,6 +628,7 @@ const onSaveFile = async (file: string) => {
                     :class="[
                         'border-b p-2 hover:bg-gray-50 select-text',
                         item.index === currentIndex ? 'bg-blue-50' : '',
+                        selectedIndexes.includes(item.index) ? 'bg-indigo-50 ring-1 ring-indigo-300' : '',
                         item.matched === false && searchKeyword.trim()
                             ? 'opacity-40'
                             : '',
@@ -527,6 +643,12 @@ const onSaveFile = async (file: string) => {
                             @change="onTextClick(item.seg)"
                             class="mr-2 flex-shrink-0"
                         />
+                        <input
+                            type="checkbox"
+                            :checked="selectedIndexes.includes(item.index)"
+                            @click.stop="toggleSelect(item.index)"
+                            class="mr-2 flex-shrink-0 accent-indigo-500"
+                        />
                         <div
                             class="text-xs text-gray-500 font-mono cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
                             @mousedown.stop="onTimestampMouseDown($event)"
@@ -537,6 +659,22 @@ const onSaveFile = async (file: string) => {
                             {{ TimeUtil.secondsToTime(item.seg.endSeconds, true) }}
                         </div>
                         <div class="flex-grow"></div>
+                        <a-button
+                            v-if="editingIndex !== item.index"
+                            size="mini"
+                            type="text"
+                            @click.stop="startEdit(item.index)"
+                        >
+                            <icon-edit />
+                        </a-button>
+                        <a-button
+                            v-if="editingIndex !== item.index"
+                            size="mini"
+                            type="text"
+                            @click.stop="splitIndex = item.index; splitText = ''"
+                        >
+                            <icon-scissors />
+                        </a-button>
                         <a-tag
                             :color="item.seg.include ? 'green' : 'red'"
                             size="small"
@@ -549,6 +687,21 @@ const onSaveFile = async (file: string) => {
                         </a-tag>
                     </div>
                     <div
+                        v-if="editingIndex === item.index"
+                        class="mt-1 flex items-center gap-2"
+                    >
+                        <a-input
+                            v-model="editText"
+                            size="small"
+                            class="flex-grow"
+                            @keydown.enter="doSaveEdit"
+                            @keydown.escape="doCancelEdit"
+                        />
+                        <a-button size="mini" type="primary" @click="doSaveEdit">保存</a-button>
+                        <a-button size="mini" @click="doCancelEdit">取消</a-button>
+                    </div>
+                    <div
+                        v-else
                         class="text-sm mt-1"
                         :class="item.seg.include ? 'text-gray-800' : 'text-gray-400 line-through'"
                         v-html="highlightText(item.seg.text || $t('common.emptySegment'), searchKeyword)"
