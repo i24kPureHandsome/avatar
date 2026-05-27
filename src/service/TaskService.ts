@@ -35,6 +35,7 @@ export type TaskBiz =
     | "VideoMerge"
     | "MediaFormatConvert"
     | "Ffmpeg"
+    | "TextCutVideo"
     // workflow
     | "Workflow";
 
