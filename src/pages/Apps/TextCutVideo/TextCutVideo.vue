@@ -397,7 +397,7 @@ const onSaveFile = async (file: string) => {
                     :key="item.index"
                     :data-segment-index="item.index"
                     :class="[
-                        'border-b p-2 hover:bg-gray-50',
+                        'border-b p-2 hover:bg-gray-50 select-text',
                         item.index === currentIndex ? 'bg-blue-50' : '',
                         item.matched === false && searchKeyword.trim()
                             ? 'opacity-40'
