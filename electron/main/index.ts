@@ -121,6 +121,23 @@ async function createWindow() {
             skipTaskbar: true,
         });
         rendererLoadPath(AppRuntime.splashWindow, "splash.html");
+        AppRuntime.splashWindow.webContents.on("did-finish-load", () => {
+            try {
+                const ConfigData = ConfigMain.allSync();
+                const brandName = (ConfigData as any)?.appName || AppConfig.name;
+                const brandTitle = (ConfigData as any)?.appTitle || AppConfig.title;
+                const brandSlogan = (ConfigData as any)?.appSlogan || AppConfig.slogan;
+                AppRuntime.splashWindow?.webContents.executeJavaScript(`
+                    document.title = ${JSON.stringify(brandTitle)};
+                    document.querySelectorAll('[data-brand]').forEach(el => {
+                        el.textContent = ${JSON.stringify(brandName)};
+                    });
+                    document.querySelectorAll('[data-brand-slogan]').forEach(el => {
+                        el.textContent = ${JSON.stringify(brandSlogan)};
+                    });
+                `);
+            } catch (e) {}
+        });
     }
     AppRuntime.mainWindow = new BrowserWindow({
         show: !hasSplashWindow,

@@ -22,16 +22,23 @@ const onLocaleChange = (value: string) => {
     <a-form :model="{}" layout="vertical">
         <a-form-item field="appName" :label="t('setting.brandName')" :extra="t('setting.brandChangeTip')">
             <a-input
-                :model-value="setting.config['appName'] ?? ''"
+                :default-value="setting.config['appName'] ?? ''"
                 @change="setting.onConfigChange('appName', $event)"
                 :placeholder="BrandDefaults.name"
             />
         </a-form-item>
         <a-form-item field="appTitle" :label="t('setting.brandTitle')" :extra="t('setting.brandChangeTip')">
             <a-input
-                :model-value="setting.config['appTitle'] ?? ''"
+                :default-value="setting.config['appTitle'] ?? ''"
                 @change="setting.onConfigChange('appTitle', $event)"
                 :placeholder="BrandDefaults.title"
+            />
+        </a-form-item>
+        <a-form-item field="appSlogan" :label="t('setting.brandSlogan')" :extra="t('setting.brandChangeTip')">
+            <a-input
+                :default-value="setting.config['appSlogan'] ?? ''"
+                @change="setting.onConfigChange('appSlogan', $event)"
+                :placeholder="BrandDefaults.slogan"
             />
         </a-form-item>
         <a-form-item field="name" :label="t('common.language')">

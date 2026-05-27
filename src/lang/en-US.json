@@ -352,6 +352,7 @@
     "welcome.title": "Welcome to {appName}!",
     "setting.brandName": "Brand Name",
     "setting.brandTitle": "Brand Title",
+    "setting.brandSlogan": "Brand Slogan",
     "setting.brandChangeTip": "Changes will take effect after restarting the app",
     "common.clear": "Clear",
     "common.clickToAdd": "Click to Add",

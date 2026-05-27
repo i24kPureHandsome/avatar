@@ -36,4 +36,7 @@ export function initAppBrand(config: Record<string, any>) {
     if ("appTitle" in config && config.appTitle) {
         AppConfig.title = config.appTitle;
     }
+    if ("appSlogan" in config && config.appSlogan) {
+        AppConfig.slogan = config.appSlogan;
+    }
 }
