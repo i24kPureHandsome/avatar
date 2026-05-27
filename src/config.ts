@@ -2,9 +2,14 @@ import packageJson from "../package.json";
 
 const BASE_URL = "https://aigcpanel.com";
 
+export const BrandDefaults = {
+    name: "AI-AVATAR",
+    title: "AI-AVATAR",
+};
+
 export const AppConfig = {
-    name: "AIGCPanel",
-    title: "AIGCPanel",
+    name: BrandDefaults.name,
+    title: BrandDefaults.title,
     slogan: "一站式AI数字人系统",
     version: packageJson.version,
     website: `${BASE_URL}`,
@@ -22,3 +27,12 @@ export const AppConfig = {
         userEnable: false,
     },
 };
+
+export function initAppBrand(config: Record<string, any>) {
+    if ("appName" in config && config.appName) {
+        AppConfig.name = config.appName;
+    }
+    if ("appTitle" in config && config.appTitle) {
+        AppConfig.title = config.appTitle;
+    }
+}
