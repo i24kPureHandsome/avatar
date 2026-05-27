@@ -87,6 +87,7 @@ onMounted(async () => {
             >
                 {{ $t("welcome.title", { appName: AppConfig.title }) }}
             </div>
+            <!-- 隐藏：求助链接
             <a
                 target="_blank"
                 class="text-gray-500 hover:text-blue-500 transition-colors text-sm flex items-center"
@@ -95,6 +96,7 @@ onMounted(async () => {
                 <icon-message class="mr-1" />
                 {{ $t("feedback.help") }}
             </a>
+            /隐藏：求助链接 -->
         </div>
 
         <!-- 导航卡片 -->
@@ -166,6 +168,7 @@ onMounted(async () => {
                 </div>
             </div>
 
+            <!-- 隐藏：智能直播卡片
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
                 data-nav="live"
@@ -187,9 +190,11 @@ onMounted(async () => {
                     <icon-live-broadcast class="text-rose-500 text-2xl" />
                 </div>
             </div>
+            /隐藏：智能直播卡片 -->
         </div>
 
         <!-- 数据统计 -->
+        <!-- 隐藏：数据统计
         <div
             class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-6 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
             data-auto-test-id="home-statistics"
@@ -352,8 +357,9 @@ onMounted(async () => {
                 </div>
             </div>
         </div>
+        /隐藏：数据统计 -->
 
-        <!-- 云端 AI 模型 / 模型市场 / 工单反馈 -->
+        <!-- 隐藏：模型市场和工单反馈
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <a
                 href="https://aigcpanel.com/zh/asset"
@@ -401,7 +407,9 @@ onMounted(async () => {
                 <FeedbackTicketButton />
             </div>
         </div>
+        /隐藏：模型市场和工单反馈 -->
 
+        <!-- 隐藏：小工具区
         <!-- 小工具功能卡片 -->
         <div
             class="bg-white dark:bg-gray-800 rounded-xl p-5 mb-5 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow"
@@ -457,6 +465,7 @@ onMounted(async () => {
                 </div>
             </div>
         </div>
+        /隐藏：小工具区 -->
     </div>
 </template>
 
