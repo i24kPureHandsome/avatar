@@ -42,6 +42,15 @@ const save = () => {
     fs.writeFileSync(filePath(), JSON.stringify(data, null, 4));
 };
 
+const allSyncFresh = () => {
+    try {
+        let json = fs.readFileSync(filePath()).toString();
+        return JSON.parse(json) || {};
+    } catch (e) {
+        return {};
+    }
+};
+
 const allSync = () => {
     loadIfNeed();
     return data;
@@ -117,6 +126,7 @@ ipcMain.handle("config:setEnv", async (_, key: string, value: any) => {
 export const ConfigMain = {
     all,
     allSync,
+    allSyncFresh,
     get,
     set,
     allEnv,

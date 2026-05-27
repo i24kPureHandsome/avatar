@@ -123,10 +123,11 @@ async function createWindow() {
         rendererLoadPath(AppRuntime.splashWindow, "splash.html");
         AppRuntime.splashWindow.webContents.on("did-finish-load", () => {
             try {
-                const ConfigData = ConfigMain.allSync();
+                const ConfigData = ConfigMain.allSyncFresh();
                 const brandName = (ConfigData as any)?.appName || AppConfig.name;
                 const brandTitle = (ConfigData as any)?.appTitle || AppConfig.title;
                 const brandSlogan = (ConfigData as any)?.appSlogan || AppConfig.slogan;
+                Log.info("SplashBrand", { brandName, brandTitle, brandSlogan });
                 AppRuntime.splashWindow?.webContents.executeJavaScript(`
                     document.title = ${JSON.stringify(brandTitle)};
                     document.querySelectorAll('[data-brand]').forEach(el => {
@@ -136,7 +137,9 @@ async function createWindow() {
                         el.textContent = ${JSON.stringify(brandSlogan)};
                     });
                 `);
-            } catch (e) {}
+            } catch (e) {
+                Log.error("SplashBrand.Error", e);
+            }
         });
     }
     AppRuntime.mainWindow = new BrowserWindow({
