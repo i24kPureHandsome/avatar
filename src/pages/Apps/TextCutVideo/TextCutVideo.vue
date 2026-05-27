@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, computed } from "vue";
+import { nextTick, ref, computed, watch } from "vue";
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { TimeUtil } from "../../../lib/util";
@@ -20,6 +20,7 @@ const phase = ref<Phase>("idle");
 const videoPath = ref("");
 const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
 const videoRef = ref<HTMLVideoElement | null>(null);
+const soundAsrConfigured = ref(false);
 
 const videoInfo = ref<{ duration: number; width: number; height: number; fps: number } | null>(null);
 const audioFile = ref("");
@@ -45,13 +46,27 @@ const filteredSegments = computed(() => {
 const includeCount = computed(() => segments.value.filter((s) => s.include).length);
 const totalCount = computed(() => segments.value.length);
 
+const isProcessing = computed(() => phase.value === "extracting" || phase.value === "recognizing" || phase.value === "exporting");
+
+watch(videoPath, async (newVal) => {
+    if (newVal && soundAsrConfigured.value) {
+        await doStart();
+    }
+});
+
+const onSoundAsrConfigured = async () => {
+    soundAsrConfigured.value = true;
+    if (videoPath.value) {
+        await doStart();
+    }
+};
+
 const doStart = async () => {
     const soundAsr = await soundAsrForm.value?.getValue();
     if (!soundAsr) {
         return;
     }
     if (!videoPath.value) {
-        Dialog.tipError(t("error.selectVideoFile"));
         return;
     }
     const server = await serverStore.getByKey(soundAsr.serverKey);
@@ -62,6 +77,7 @@ const doStart = async () => {
 
     exportFiles.value = [];
     segments.value = [];
+    currentIndex.value = -1;
 
     try {
         phase.value = "extracting";
@@ -200,7 +216,7 @@ const onOpenFile = async (file: string) => {
 
 const onSaveFile = async (file: string) => {
     const fileExt = file.split(".").pop() || "mp4";
-    const filePath = await window.$mapi.file.openSave({
+    let filePath = await window.$mapi.file.openSave({
         defaultPath: `导出视频.${fileExt}`,
     });
     if (!filePath) return;
@@ -213,206 +229,220 @@ const onSaveFile = async (file: string) => {
 </script>
 
 <template>
-    <div class="h-full flex flex-col">
-        <div class="p-4 border-b flex items-center gap-4 flex-shrink-0">
-            <div class="text-xl font-bold">文本剪辑视频</div>
-            <div class="text-gray-400 text-sm">通过语音识别提取视频文字内容，支持搜索定位、勾选剪辑导出</div>
-            <div class="flex-grow"></div>
-            <a-button v-if="phase !== 'idle'" size="small" @click="doReset">
-                <icon-refresh />
-                重新开始
-            </a-button>
-        </div>
-
-        <div v-if="phase === 'idle'" class="p-5 max-w-2xl mx-auto">
-            <div class="rounded-xl shadow border p-4">
-                <div class="mb-4 flex items-start">
-                    <div class="pt-1 w-5">
-                        <a-tooltip :content="$t('common.videoFile')" mini>
-                            <icon-video-camera />
-                        </a-tooltip>
-                    </div>
-                    <div class="flex items-center gap-2 flex-grow">
-                        <FileSelector :extensions="['mp4']" v-model="videoPath" />
-                    </div>
+    <div class="h-full flex">
+        <div class="w-1/2 flex flex-col border-r">
+            <div class="bg-gray-50 p-2 border-b flex items-center">
+                <div class="text-sm font-medium text-gray-700 flex-grow">
+                    {{ $t("common.preview") }}
                 </div>
-                <SoundAsrForm ref="soundAsrForm" />
-                <div class="flex mt-4">
-                    <a-button type="primary" @click="doStart">
-                        <icon-send class="mr-2" />
-                        开始识别
-                    </a-button>
+                <div v-if="videoInfo" class="text-xs text-gray-400">
+                    {{ TimeUtil.secondsToTime(videoInfo.duration) }}
                 </div>
+                <a-button
+                    v-if="videoPath"
+                    size="mini"
+                    class="ml-2"
+                    @click="doReset"
+                >
+                    <icon-refresh />
+                    重新选择
+                </a-button>
             </div>
-        </div>
-
-        <div
-            v-else-if="phase === 'extracting' || phase === 'recognizing'"
-            class="flex-grow flex items-center justify-center"
-        >
-            <div class="text-center">
-                <a-spin size="40" />
-                <div class="mt-4 text-gray-600">{{ progressMsg }}</div>
-            </div>
-        </div>
-
-        <div
-            v-else-if="phase === 'editing' || phase === 'exporting' || phase === 'done'"
-            class="flex-grow flex overflow-hidden"
-        >
-            <div class="w-1/2 flex flex-col border-r">
-                <div class="bg-gray-50 p-2 border-b flex items-center">
-                    <div class="text-sm font-medium text-gray-700 flex-grow">
-                        {{ $t("common.preview") }}
+            <div class="flex-grow relative bg-black">
+                <video
+                    v-if="videoPath"
+                    ref="videoRef"
+                    :src="`file://${videoPath}`"
+                    controls
+                    class="w-full h-full"
+                    @timeupdate="onTimeUpdate"
+                ></video>
+                <div
+                    v-else
+                    class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-gray-400 cursor-pointer"
+                    @click="($refs.videoFileSelector as any)?.$el?.querySelector('input')?.click()"
+                >
+                    <icon-video-camera class="text-5xl mb-3 text-gray-500" />
+                    <div class="text-lg mb-1">点击选择视频文件</div>
+                    <div class="text-sm text-gray-500">支持 MP4 格式</div>
+                    <div class="mt-4">
+                        <FileSelector
+                            ref="videoFileSelector"
+                            :extensions="['mp4']"
+                            v-model="videoPath"
+                            class="hidden"
+                        />
                     </div>
-                    <div v-if="videoInfo" class="text-xs text-gray-400">
-                        {{ TimeUtil.secondsToTime(videoInfo.duration) }}
-                    </div>
-                </div>
-                <div class="flex-grow bg-black">
-                    <video
-                        ref="videoRef"
-                        :src="`file://${videoPath}`"
-                        controls
-                        class="w-full h-full"
-                        @timeupdate="onTimeUpdate"
-                    ></video>
-                </div>
-            </div>
-            <div class="w-1/2 flex flex-col">
-                <div class="bg-gray-50 p-2 border-b flex items-center gap-2">
-                    <div class="text-sm font-medium text-gray-700 flex-grow">
-                        {{ $t("common.segment") }}
-                    </div>
-                    <div class="text-xs text-gray-500">
-                        {{
-                            $t("common.segmentCount", {
-                                include: includeCount,
-                                total: totalCount,
-                            })
-                        }}
-                    </div>
-                </div>
-                <div class="p-2 border-b flex items-center gap-2">
-                    <a-input
-                        v-model="searchKeyword"
-                        :placeholder="$t('common.searchText')"
-                        allow-clear
-                        size="small"
-                        class="flex-grow"
-                    >
-                        <template #prefix>
-                            <icon-search />
-                        </template>
-                    </a-input>
-                    <a-button size="mini" @click="onToggleAll(true)">
-                        {{ $t("common.selectAll") }}
-                    </a-button>
-                    <a-button size="mini" @click="onInvertSelection">
-                        {{ $t("common.invertSelection") }}
-                    </a-button>
-                    <a-button size="mini" @click="onToggleAll(false)">
-                        {{ $t("common.deSelectAll") }}
-                    </a-button>
-                </div>
-                <div class="flex-grow overflow-y-auto">
-                    <div
-                        v-for="item in filteredSegments"
-                        :key="item.index"
-                        :data-segment-index="item.index"
-                        :class="[
-                            'border-b p-2 hover:bg-gray-50 cursor-default',
-                            item.index === currentIndex ? 'bg-blue-50' : '',
-                            item.matched === false && searchKeyword.trim()
-                                ? 'opacity-40'
-                                : '',
-                        ]"
-                    >
-                        <div class="flex items-center">
-                            <div
-                                class="text-xs text-gray-500 font-mono select-none cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
-                                @click="onTimestampClick(item.seg)"
-                            >
-                                {{ TimeUtil.secondsToTime(item.seg.startSeconds, true) }}
-                                -
-                                {{ TimeUtil.secondsToTime(item.seg.endSeconds, true) }}
-                            </div>
-                            <div class="flex-grow"></div>
-                            <a-tag
-                                :color="item.seg.include ? 'green' : 'red'"
-                                size="small"
-                            >
-                                {{
-                                    item.seg.include
-                                        ? $t("common.include")
-                                        : $t("common.exclude")
-                                }}
-                            </a-tag>
-                        </div>
-                        <div
-                            class="text-sm mt-1 cursor-pointer select-none"
-                            :class="item.seg.include ? 'text-gray-800' : 'text-gray-400 line-through'"
-                            @click="onTextClick(item.seg)"
-                        >
-                            {{ item.seg.text || $t("common.emptySegment") }}
-                        </div>
-                    </div>
-                </div>
-                <div class="p-2 border-t flex items-center gap-3">
-                    <div class="text-sm text-gray-600">
-                        {{ $t("common.exportMode") }}:
-                    </div>
-                    <a-radio-group v-model="exportMode" size="small">
-                        <a-radio value="merge">
-                            {{ $t("common.mergeToOneVideo") }}
-                        </a-radio>
-                        <a-radio value="separate">
-                            {{ $t("common.exportSeparately") }}
-                        </a-radio>
-                    </a-radio-group>
-                    <div class="flex-grow"></div>
-                    <a-button
-                        v-if="phase === 'editing'"
-                        type="primary"
-                        @click="doExport"
-                    >
-                        <icon-export />
-                        导出视频
-                    </a-button>
-                    <a-spin v-else-if="phase === 'exporting'" size="small" />
                 </div>
                 <div
-                    v-if="phase === 'done' && exportFiles.length > 0"
-                    class="p-2 border-t bg-green-50"
+                    v-if="isProcessing"
+                    class="absolute inset-0 bg-black/70 flex flex-col items-center justify-center"
                 >
-                    <div class="text-sm font-medium text-green-700 mb-1">
-                        导出完成
-                    </div>
-                    <div class="space-y-1">
+                    <a-spin size="40" />
+                    <div class="mt-4 text-white text-sm">{{ progressMsg }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-1/2 flex flex-col">
+            <div class="bg-gray-50 p-2 border-b flex items-center gap-2">
+                <div class="text-sm font-medium text-gray-700 flex-grow">
+                    {{ $t("common.segment") }}
+                </div>
+                <div v-if="segments.length > 0" class="text-xs text-gray-500">
+                    {{
+                        $t("common.segmentCount", {
+                            include: includeCount,
+                            total: totalCount,
+                        })
+                    }}
+                </div>
+            </div>
+
+            <div v-if="!soundAsrConfigured" class="p-3 border-b">
+                <SoundAsrForm ref="soundAsrForm" />
+                <div class="mt-2 flex">
+                    <a-button
+                        type="primary"
+                        size="small"
+                        @click="onSoundAsrConfigured"
+                    >
+                        确认配置
+                    </a-button>
+                </div>
+            </div>
+
+            <div v-if="segments.length > 0" class="p-2 border-b flex items-center gap-2">
+                <a-input
+                    v-model="searchKeyword"
+                    :placeholder="$t('common.searchText')"
+                    allow-clear
+                    size="small"
+                    class="flex-grow"
+                >
+                    <template #prefix>
+                        <icon-search />
+                    </template>
+                </a-input>
+                <a-button size="mini" @click="onToggleAll(true)">
+                    {{ $t("common.selectAll") }}
+                </a-button>
+                <a-button size="mini" @click="onInvertSelection">
+                    {{ $t("common.invertSelection") }}
+                </a-button>
+                <a-button size="mini" @click="onToggleAll(false)">
+                    {{ $t("common.deSelectAll") }}
+                </a-button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto">
+                <div
+                    v-if="segments.length === 0 && !isProcessing && soundAsrConfigured"
+                    class="flex flex-col items-center justify-center h-full text-gray-400"
+                >
+                    <icon-file class="text-4xl mb-2 text-gray-300" />
+                    <div v-if="!videoPath" class="text-sm">请在左侧选择视频文件</div>
+                    <div v-else class="text-sm">等待识别结果...</div>
+                </div>
+                <div
+                    v-for="item in filteredSegments"
+                    :key="item.index"
+                    :data-segment-index="item.index"
+                    :class="[
+                        'border-b p-2 hover:bg-gray-50 cursor-default',
+                        item.index === currentIndex ? 'bg-blue-50' : '',
+                        item.matched === false && searchKeyword.trim()
+                            ? 'opacity-40'
+                            : '',
+                    ]"
+                >
+                    <div class="flex items-center">
                         <div
-                            v-for="(file, idx) in exportFiles"
-                            :key="idx"
-                            class="flex items-center gap-2"
+                            class="text-xs text-gray-500 font-mono select-none cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
+                            @click="onTimestampClick(item.seg)"
                         >
-                            <icon-file class="text-green-600" />
-                            <span class="text-sm text-gray-700 flex-grow truncate">
-                                {{ file.split(/[\\/]/).pop() }}
-                            </span>
-                            <a-button
-                                size="mini"
-                                type="text"
-                                @click="onOpenFile(file)"
-                            >
-                                <icon-eye />
-                            </a-button>
-                            <a-button
-                                size="mini"
-                                type="text"
-                                @click="onSaveFile(file)"
-                            >
-                                <icon-download />
-                            </a-button>
+                            {{ TimeUtil.secondsToTime(item.seg.startSeconds, true) }}
+                            -
+                            {{ TimeUtil.secondsToTime(item.seg.endSeconds, true) }}
                         </div>
+                        <div class="flex-grow"></div>
+                        <a-tag
+                            :color="item.seg.include ? 'green' : 'red'"
+                            size="small"
+                        >
+                            {{
+                                item.seg.include
+                                    ? $t("common.include")
+                                    : $t("common.exclude")
+                            }}
+                        </a-tag>
+                    </div>
+                    <div
+                        class="text-sm mt-1 cursor-pointer select-none"
+                        :class="item.seg.include ? 'text-gray-800' : 'text-gray-400 line-through'"
+                        @click="onTextClick(item.seg)"
+                    >
+                        {{ item.seg.text || $t("common.emptySegment") }}
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="segments.length > 0" class="p-2 border-t flex items-center gap-3">
+                <div class="text-sm text-gray-600">
+                    {{ $t("common.exportMode") }}:
+                </div>
+                <a-radio-group v-model="exportMode" size="small">
+                    <a-radio value="merge">
+                        {{ $t("common.mergeToOneVideo") }}
+                    </a-radio>
+                    <a-radio value="separate">
+                        {{ $t("common.exportSeparately") }}
+                    </a-radio>
+                </a-radio-group>
+                <div class="flex-grow"></div>
+                <a-button
+                    v-if="phase === 'editing' || phase === 'done'"
+                    type="primary"
+                    size="small"
+                    @click="doExport"
+                >
+                    <icon-export class="mr-1" />
+                    导出视频
+                </a-button>
+                <a-spin v-else-if="phase === 'exporting'" size="small" />
+            </div>
+
+            <div
+                v-if="phase === 'done' && exportFiles.length > 0"
+                class="p-2 border-t bg-green-50"
+            >
+                <div class="text-sm font-medium text-green-700 mb-1">
+                    导出完成
+                </div>
+                <div class="space-y-1">
+                    <div
+                        v-for="(file, idx) in exportFiles"
+                        :key="idx"
+                        class="flex items-center gap-2"
+                    >
+                        <icon-file class="text-green-600" />
+                        <span class="text-sm text-gray-700 flex-grow truncate">
+                            {{ file.split(/[\\/]/).pop() }}
+                        </span>
+                        <a-button
+                            size="mini"
+                            type="text"
+                            @click="onOpenFile(file)"
+                        >
+                            <icon-eye />
+                        </a-button>
+                        <a-button
+                            size="mini"
+                            type="text"
+                            @click="onSaveFile(file)"
+                        >
+                            <icon-download />
+                        </a-button>
                     </div>
                 </div>
             </div>
