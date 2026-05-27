@@ -16,7 +16,6 @@ import ModelSelector from "../../../module/Model/ModelSelector.vue";
 
 const serverStore = useServerStore();
 const modelStore = useModelStore();
-
 type Phase = "idle" | "extracting" | "recognizing" | "editing" | "exporting" | "done";
 
 const phase = ref<Phase>("idle");
@@ -33,7 +32,7 @@ const searchKeyword = ref("");
 const exportMode = ref<"merge" | "separate">("merge");
 const exportFiles = ref<string[]>([]);
 const progressMsg = ref("");
-const modelSelectorRef = ref<any>(null);
+const selectedModel = ref("");
 const smartMerging = ref(false);
 
 const filteredSegments = computed(() => {
@@ -253,34 +252,11 @@ const onInvertSelection = () => {
 };
 
 const doSmartMerge = async () => {
-    const selectorComp = modelSelectorRef.value;
-    if (!selectorComp) {
+    if (!selectedModel.value || !selectedModel.value.includes("|")) {
         Dialog.tipError("请先选择 AI 模型");
         return;
     }
-    const info = selectorComp.getInfo?.();
-    if (!info?.providerTitle || !info?.modelName) {
-        Dialog.tipError("请先选择 AI 模型");
-        return;
-    }
-    let providerId = "";
-    let modelId = "";
-    for (const p of modelStore.providers) {
-        if (p.title === info.providerTitle) {
-            providerId = p.id;
-            for (const m of p.data.models) {
-                if (m.name === info.modelName) {
-                    modelId = m.id;
-                    break;
-                }
-            }
-            break;
-        }
-    }
-    if (!providerId || !modelId) {
-        Dialog.tipError("未找到对应模型配置");
-        return;
-    }
+    const [providerId, modelId] = selectedModel.value.split("|");
 
     const lines = segments.value.map(
         (seg, i) => `[${i}] ${seg.text}`,
@@ -510,7 +486,7 @@ const onSaveFile = async (file: string) => {
             </div>
 
             <div v-if="segments.length > 0" class="p-2 border-b flex items-center gap-2">
-                <ModelSelector ref="modelSelectorRef" style="min-width: 180px" />
+                <ModelSelector v-model="selectedModel" style="min-width: 180px" />
                 <a-button
                     size="small"
                     type="outline"
