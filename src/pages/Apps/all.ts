@@ -312,10 +312,10 @@ export const AllApps = [
         ...app,
         url: `/tool?tab=${app.name}`,
     })) as any),
-    {
-        title: t("feedback.toolRequest"),
-        description: t("msg.moreTools"),
-        icon: FeedbackIcon,
-        url: "https://aigcpanel.com/wish",
-    },
+    // {
+    //     title: t("feedback.toolRequest"),
+    //     description: t("msg.moreTools"),
+    //     icon: FeedbackIcon,
+    //     url: "https://aigcpanel.com/wish",
+    // },
 ];
