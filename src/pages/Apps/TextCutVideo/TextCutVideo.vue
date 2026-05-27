@@ -395,9 +395,8 @@ const onSaveFile = async (file: string) => {
                         </a-tag>
                     </div>
                     <div
-                        class="text-sm mt-1 cursor-pointer select-none"
+                        class="text-sm mt-1 select-text"
                         :class="item.seg.include ? 'text-gray-800' : 'text-gray-400 line-through'"
-                        @click="onTextClick(item.seg)"
                         v-html="highlightText(item.seg.text || $t('common.emptySegment'), searchKeyword)"
                     ></div>
                 </div>
