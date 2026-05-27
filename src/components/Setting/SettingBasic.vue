@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { changeLocale, getLocale, listLocales, t } from "../../lang";
 import { useSettingStore } from "../../store/modules/setting";
+import { AppConfig, BrandDefaults } from "../../config";
 import { onMounted, ref } from "vue";
 
 const locale = ref("");
@@ -19,6 +20,20 @@ const onLocaleChange = (value: string) => {
 
 <template>
     <a-form :model="{}" layout="vertical">
+        <a-form-item field="appName" :label="t('setting.brandName')">
+            <a-input
+                :model-value="setting.configGet('appName', '').value"
+                @change="setting.onConfigChange('appName', $event)"
+                :placeholder="BrandDefaults.name"
+            />
+        </a-form-item>
+        <a-form-item field="appTitle" :label="t('setting.brandTitle')">
+            <a-input
+                :model-value="setting.configGet('appTitle', '').value"
+                @change="setting.onConfigChange('appTitle', $event)"
+                :placeholder="BrandDefaults.title"
+            />
+        </a-form-item>
         <a-form-item field="name" :label="t('common.language')">
             <a-select
                 :model-value="locale as string"
