@@ -12,6 +12,7 @@ import LongTextTtsIcon from "~icons/mdi/waveform";
 import SubtitleTtsIcon from "~icons/mdi/subtitles";
 import SoundReplaceIcon from "~icons/mdi/microphone-variant";
 import SoundAsrIcon from "~icons/mdi/microphone-outline";
+import TextCutVideoIcon from "~icons/mdi/text-box-search";
 
 import VideoGenFlowIcon from "~icons/mdi/video-vintage";
 
@@ -94,6 +95,16 @@ export const SoundToolApps = [
 ];
 
 export const VideoApps = [
+    {
+        name: "TextCutVideo",
+        title: t("task.textCutVideo"),
+        description: "通过语音识别提取视频文字内容，支持搜索定位、勾选剪辑",
+        icon: TextCutVideoIcon,
+        color: "#8b5cf6",
+        component: defineAsyncComponent(
+            () => import("./TextCutVideo/TextCutVideo.vue"),
+        ),
+    },
     {
         name: "VideoGenFlow",
         title: t("avatar.oneClickSynthesis"),
