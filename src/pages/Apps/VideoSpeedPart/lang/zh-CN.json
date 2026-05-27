@@ -1,0 +1,7 @@
+{
+    "common.speedMark": "加速标识",
+    "common.accelerationCoefficient": "加速系数",
+    "common.accelerationValue": "加速系数 {speed}x",
+    "common.setSpeedTimeRange": "设置加速时间范围",
+    "error.validAcceleration": "请设置有效的加速系数"
+}

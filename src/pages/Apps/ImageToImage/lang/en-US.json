@@ -1,0 +1,17 @@
+{
+    "app.generateImage": "Generate Image",
+    "app.generateImageDesc": "Generate new images from prompts",
+    "app.imageGenerateService": "Image Generation Service",
+    "app.imageGeneration": "Image Generation",
+    "app.imageLabel": "Image",
+    "app.imageToImageDesc": "Convert image to image",
+    "app.imageToImageSettings": "Image-to-Image Settings",
+    "app.inputPromptDesc": "Enter text describing the image",
+    "app.inputPromptLabel": "Input Prompt",
+    "app.processImage": "Process Image",
+    "app.promptText": "Prompt Text",
+    "app.selectLocalImage": "Select Local Image",
+    "app.selectLocalImageDesc": "Upload and select the image to convert",
+    "app.imageToImageConfig": "Image to Image Config",
+    "workflow.paramErrorMissing": "Parameter error: missing {items}"
+}

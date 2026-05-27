@@ -1,0 +1,15 @@
+{
+    "app.imageGenerateService": "Image Generation Service",
+    "app.imageGeneration": "Image Generation",
+    "app.inputPromptDesc": "Enter text describing the image",
+    "app.inputPromptLabel": "Input Prompt",
+    "app.mergeImage": "Merge Image",
+    "app.mergeImageDesc": "Merge all image fragments into one long image",
+    "app.processImage": "Process Image",
+    "app.promptLabel": "Prompt",
+    "app.promptText": "Prompt Text",
+    "app.textToImageDesc": "Convert text to image",
+    "app.textToImageSettings": "Text-to-Image Settings",
+    "app.textToImageConfig": "Text to Image Config",
+    "workflow.paramErrorMissing": "Parameter error: missing {items}"
+}

@@ -1,0 +1,15 @@
+{
+    "common.volume": "Volume",
+    "common.loopAudio": "Loop Audio",
+    "common.fadeIn": "Fade In",
+    "common.fadeOut": "Fade Out",
+    "common.audioFile": "Audio File",
+    "error.validAudioVolume": "Please set a valid audio volume",
+    "error.validFadeInTime": "Please set a valid fade in time",
+    "error.validFadeOutTime": "Please set a valid fade out time",
+    "error.videoParamError": "Video parameter error",
+    "error.audioParamError": "Audio parameter error",
+    "error.selectAudioFile2": "Please select an audio file",
+    "error.inputVolumeParam": "Please enter volume parameter",
+    "error.inputAudioParam": "Please enter audio parameter"
+}

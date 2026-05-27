@@ -1,0 +1,21 @@
+{
+    "common.second": "second",
+    "common.noAnimation": "No Animation",
+    "common.position": "Position",
+    "common.length": "Length",
+    "common.animation": "Animation",
+    "common.zoomPercent": "Zoom%",
+    "common.zoomIn2": "Zoom In",
+    "common.mergeConfig": "Merge Config",
+    "common.positionStart": "Intro",
+    "common.positionEnd": "Outro",
+    "common.positionStartImage": "Intro Image",
+    "common.positionEndImage": "Outro Image",
+    "common.imageFile": "Image File",
+    "error.validDuration": "Please set a valid intro image duration",
+    "error.validZoomPercent": "Please set a valid zoom percentage",
+    "error.selectImageFile": "Please select an image",
+    "error.inputImageParam2": "Please enter image parameter",
+    "error.inputImagePositionDuration": "Please enter image position and duration",
+    "error.videoInfo": "Unable to get video information"
+}

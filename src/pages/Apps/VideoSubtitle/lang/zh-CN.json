@@ -1,0 +1,5 @@
+{
+    "common.subtitleFile": "字幕文件",
+    "error.selectSubtitleFile": "请选择字幕文件",
+    "error.inputSubtitleParam": "请输入字幕参数"
+}

@@ -1,0 +1,15 @@
+{
+    "common.volume": "音量",
+    "common.loopAudio": "循环音频",
+    "common.fadeIn": "淡入时间",
+    "common.fadeOut": "淡出时间",
+    "common.audioFile": "音频文件",
+    "error.validAudioVolume": "请设置有效的音频音量",
+    "error.validFadeInTime": "请设置有效的淡入时间",
+    "error.validFadeOutTime": "请设置有效的淡出时间",
+    "error.videoParamError": "视频参数错误",
+    "error.audioParamError": "音频参数错误",
+    "error.selectAudioFile2": "请选择音频文件",
+    "error.inputVolumeParam": "请输入音量参数",
+    "error.inputAudioParam": "请输入音频参数"
+}

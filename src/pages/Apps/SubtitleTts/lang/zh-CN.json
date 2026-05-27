@@ -1,0 +1,14 @@
+{
+    "subtitleTts.audioSynthesis": "音频合成",
+    "subtitleTts.parseSubtitle": "解析字幕",
+    "subtitleTts.settings": "字幕转音频设置",
+    "subtitleTts.synthesizedAudio": "合成音频",
+    "app.audioSynthesis": "音频合成",
+    "app.subtitleAudioDesc": "根据字幕顺序合成音频，支持自动速度调整",
+    "app.subtitleFileLabel": "字幕文件",
+    "app.subtitleParseDesc": "读取SRT字幕文件并解析时间和文本",
+    "app.subtitleParseLabel": "解析字幕文件",
+    "app.subtitleTtsDesc": "将SRT字幕文件转换为音频",
+    "workflow.soundGenerationService": "声音生成服务",
+    "workflow.paramErrorMissing": "参数错误：缺少 {items}"
+}

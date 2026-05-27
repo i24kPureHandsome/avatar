@@ -1,0 +1,16 @@
+{
+    "app.audioSynthesis": "音频合成",
+    "app.inputLongText": "请输入长文本",
+    "app.inputLongTextPlaceholder": "请输入要转换为音频的长文本",
+    "app.longTextLabel": "长文本",
+    "app.longTextTts": "长文本转音频",
+    "app.longTextTtsAudioDesc": "为每个片段合成音频",
+    "app.longTextTtsDesc": "将长文本转换为音频",
+    "app.longTextTtsMergeDesc": "将所有音频片段合并成一个长音频",
+    "app.longTextTtsSettings": "长文本转音频设置",
+    "app.longTextTtsSplitDesc": "将长文本分割成不超过150字的片段",
+    "app.mergeAudio": "合并音频",
+    "app.splitText": "分割文本",
+    "workflow.soundGenerationService": "声音生成服务",
+    "workflow.paramErrorMissing": "参数错误：缺少 {items}"
+}

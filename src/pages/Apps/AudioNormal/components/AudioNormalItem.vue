@@ -1,0 +1,127 @@
+<script setup lang="ts">
+import TaskCancelAction from "../../../../components/Server/TaskCancelAction.vue";
+import TaskContinueAction from "../../../../components/Server/TaskContinueAction.vue";
+import TaskDeleteAction from "../../../../components/Server/TaskDeleteAction.vue";
+import TaskDownloadAction from "../../../../components/Server/TaskDownloadAction.vue";
+import TaskDuration from "../../../../components/Server/TaskDuration.vue";
+import TaskTitleField from "../../../../components/Server/TaskTitleField.vue";
+import AudioPlayer from "../../../../components/common/AudioPlayer.vue";
+import TaskBizStatus from "../../../../components/common/TaskBizStatus.vue";
+import TaskJobResultStepView from "../../../../components/common/TaskJobResultStepView.vue";
+import VideoPreviewBox from "../../../../components/common/VideoPreviewBox.vue";
+import { TaskRecord } from "../../../../service/TaskService";
+import AudioInfo from "../../common/AudioInfo.vue";
+import VideoInfo from "../../common/VideoInfo.vue";
+import { AudioNormalJobResultType, AudioNormalModelConfigType } from "../type";
+
+const props = defineProps<{
+    record: TaskRecord<AudioNormalModelConfigType, AudioNormalJobResultType>;
+    dialog: boolean;
+    onRefresh: () => void;
+}>();
+</script>
+
+<template>
+    <div class="rounded-xl shadow border p-4 mb-4 hover:shadow-lg">
+        <div class="flex items-center gap-1">
+            <div
+                class="inline-flex items-start bg-blue-100 rounded-full px-2 leading-8 h-8 mr-2"
+            >
+                <div v-if="!dialog" class="mr-2 h-8 pt-0.5">
+                    <a-checkbox v-model="record['_check']" />
+                </div>
+                <div class="">
+                    <TaskTitleField
+                        :record="record"
+                        :disabled="dialog"
+                        @title-click="record['_check'] = !record['_check']"
+                        @update="(v) => (record.title = v)"
+                    />
+                </div>
+            </div>
+            <div class="flex-grow"></div>
+            <TaskDuration
+                v-if="record.status === 'running'"
+                :start="record.startTime"
+                :end="record.endTime"
+            />
+            <TaskBizStatus
+                :status="record.status"
+                :status-msg="record.statusMsg"
+            />
+        </div>
+        <div class="mt-3 flex">
+            <div class="w-24 flex-shrink-0">
+                <div class="inline-block text-center">
+                    <icon-file />
+                    解析文件
+                </div>
+            </div>
+            <div class="flex-grow">
+                <TaskJobResultStepView :record="record" step="Prepare">
+                    <div
+                        class="flex gap-2 mb-2"
+                        v-if="record.jobResult?.Prepare.isVideo"
+                    >
+                        <VideoInfo :data="record.jobResult?.Prepare!" />
+                    </div>
+                    <div class="flex gap-2">
+                        <AudioInfo :data="record.jobResult?.Prepare!" />
+                    </div>
+                </TaskJobResultStepView>
+            </div>
+        </div>
+        <div class="mt-3 flex items-center">
+            <div class="w-24 flex-shrink-0">
+                <div class="inline-block text-center">
+                    <icon-sound />
+                    归一化配置
+                </div>
+            </div>
+            <div class="flex-grow">
+                <TaskJobResultStepView :record="record" step="Config">
+                    <div class="flex items-center gap-1 mb-2">
+                        <a-tag class="rounded-lg"
+                            >归一化程度:
+                            {{
+                                record.modelConfig?.normalizationPercentage
+                            }}%</a-tag
+                        >
+                    </div>
+                </TaskJobResultStepView>
+            </div>
+        </div>
+        <div class="mt-3 flex">
+            <div class="w-24 flex-shrink-0">
+                <div class="inline-block text-center">
+                    <icon-file />
+                    文件渲染
+                </div>
+            </div>
+            <TaskJobResultStepView :record="record" step="Render">
+                <div v-if="record.jobResult?.Prepare.isVideo">
+                    <VideoPreviewBox :url="record.jobResult?.Render.file!" />
+                </div>
+                <div v-else>
+                    <AudioPlayer :url="record.jobResult?.Render.file" />
+                </div>
+            </TaskJobResultStepView>
+        </div>
+        <div class="pt-4 flex items-center">
+            <div class="text-gray-400 text-xs mr-2">#{{ record.id }}</div>
+            <div class="text-gray-400 flex-grow">
+                <timeago :datetime="record['createdAt'] * 1000" />
+            </div>
+            <div class="">
+                <TaskDownloadAction :record="record" />
+                <TaskDeleteAction
+                    v-if="!dialog"
+                    :record="record"
+                    @update="onRefresh"
+                />
+                <TaskContinueAction :record="record" @update="onRefresh" />
+                <TaskCancelAction :record="record" />
+            </div>
+        </div>
+    </div>
+</template>

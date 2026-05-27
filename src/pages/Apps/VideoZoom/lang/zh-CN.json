@@ -1,0 +1,8 @@
+{
+    "common.zoomMark": "放大标识",
+    "common.zoomDuration": "放大持续时间",
+    "common.manualSetTimeNode": "手动设置时间节点",
+    "common.confirmDone": "确认无误完成",
+    "error.validZoomDuration": "请设置有效的放大持续时间",
+    "msg.taskNotCompleteConfirmFinal": "任务未完成，需要手动确认终稿"
+}

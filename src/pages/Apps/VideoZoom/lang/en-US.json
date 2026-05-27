@@ -1,0 +1,8 @@
+{
+    "common.zoomMark": "Zoom Mark",
+    "common.zoomDuration": "Zoom Duration",
+    "common.manualSetTimeNode": "Manual Set Time Node",
+    "common.confirmDone": "Confirm Done",
+    "error.validZoomDuration": "Please set a valid zoom duration",
+    "msg.taskNotCompleteConfirmFinal": "Task incomplete, manual final confirmation required"
+}

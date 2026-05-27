@@ -1,0 +1,13 @@
+{
+    "common.sizeConfig": "尺寸配置",
+    "common.fillMode": "填充模式",
+    "common.targetSize": "目标尺寸",
+    "common.selectPreset": "选择预设尺寸",
+    "common.blurFill": "模糊填充",
+    "common.blackFill": "黑边填充",
+    "common.cropFill": "裁剪填充",
+    "common.stretchFill": "拉伸填充",
+    "error.validTargetWidth": "请设置有效的目标宽度",
+    "error.validTargetHeight": "请设置有效的目标高度",
+    "error.inputSizeParam": "请输入尺寸参数"
+}

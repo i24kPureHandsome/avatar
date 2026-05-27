@@ -1,0 +1,16 @@
+{
+    "app.audioSynthesis": "Audio Synthesis",
+    "app.inputLongText": "Please enter long text",
+    "app.inputLongTextPlaceholder": "Please enter the long text you want to convert to audio",
+    "app.longTextLabel": "Long Text",
+    "app.longTextTts": "Long Text to Audio",
+    "app.longTextTtsAudioDesc": "Synthesize audio for each segment",
+    "app.longTextTtsDesc": "Convert long text to audio",
+    "app.longTextTtsMergeDesc": "Merge all audio segments into one long audio",
+    "app.longTextTtsSettings": "Long Text to Audio Settings",
+    "app.longTextTtsSplitDesc": "Split long text into segments of no more than 150 characters",
+    "app.mergeAudio": "Merge Audio",
+    "app.splitText": "Split Text",
+    "workflow.soundGenerationService": "Voice generation service",
+    "workflow.paramErrorMissing": "Parameter error: missing {items}"
+}

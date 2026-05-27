@@ -1,0 +1,17 @@
+{
+    "app.generateImage": "生成图像",
+    "app.generateImageDesc": "根据提示词生成新的图像",
+    "app.imageGenerateService": "图像生成服务",
+    "app.imageGeneration": "图像生成",
+    "app.imageLabel": "图像",
+    "app.imageToImageDesc": "将图像转换为图像",
+    "app.imageToImageSettings": "图生图设置",
+    "app.inputPromptDesc": "输入描述图像的文本",
+    "app.inputPromptLabel": "输入提示词",
+    "app.processImage": "处理图像",
+    "app.promptText": "提示文本",
+    "app.selectLocalImage": "选择本地图片",
+    "app.selectLocalImageDesc": "上传并选择要转换的图片",
+    "app.imageToImageConfig": "图生图配置",
+    "workflow.paramErrorMissing": "参数错误：缺少 {items}"
+}

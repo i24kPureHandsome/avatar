@@ -1,0 +1,7 @@
+{
+    "common.speedConfig": "Speed Config",
+    "common.speedValue": "Speed {speed}x",
+    "common.playbackSpeed": "Playback Speed",
+    "common.customSpeed": "Custom Speed",
+    "error.validPlaybackSpeed": "Please set a valid playback speed"
+}

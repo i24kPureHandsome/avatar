@@ -1,0 +1,5 @@
+{
+    "common.subtitleFile": "Subtitle File",
+    "error.selectSubtitleFile": "Please select a subtitle file",
+    "error.inputSubtitleParam": "Please enter subtitle parameter"
+}

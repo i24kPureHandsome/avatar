@@ -1,0 +1,23 @@
+{
+    "soundReplace.confirmComplete": "确认无误完成",
+    "soundReplace.confirmText": "确认文字",
+    "soundReplace.confirmTextDesc": "检查并确认识别出的文本内容",
+    "soundReplace.extractAndRecognize": "提取音频并识别",
+    "soundReplace.extractAndRecognizeDesc": "选择包含需要替换声音的视频文件",
+    "soundReplace.extractAudio": "提取音频",
+    "soundReplace.manualConfirmText": "手动确认文字",
+    "soundReplace.modifyText": "修改文字",
+    "soundReplace.reorderConfirm": "重排确认",
+    "soundReplace.reverifyText": "重新校验文字",
+    "soundReplace.saveAndSynthesize": "保存并合成",
+    "soundReplace.submitTask": "提交任务",
+    "soundReplace.synthesizeReplace": "声音合成替换",
+    "soundReplace.synthesizeReplaceDesc": "设置声音合成模型参数，生成新的语音",
+    "soundReplace.taskSubmitted": "任务已提交",
+    "soundReplace.videoSynthesis": "视频合成",
+    "workflow.configureRecognitionAndGeneration": "请配置声音识别和声音生成服务",
+    "workflow.inputVideoParam": "请输入视频参数",
+    "workflow.paramErrorMissing": "参数错误：缺少 {items}",
+    "workflow.soundGenerationService": "声音生成服务",
+    "workflow.soundRecognitionService": "声音识别服务"
+}

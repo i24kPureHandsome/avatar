@@ -1,0 +1,15 @@
+{
+    "app.imageGenerateService": "图像生成服务",
+    "app.imageGeneration": "图像生成",
+    "app.inputPromptDesc": "输入描述图像的文本",
+    "app.inputPromptLabel": "输入提示词",
+    "app.mergeImage": "合并图像",
+    "app.mergeImageDesc": "将所有图像片段合并成一个长图像",
+    "app.processImage": "处理图像",
+    "app.promptLabel": "提示词",
+    "app.promptText": "提示文本",
+    "app.textToImageDesc": "将文本转换为图像",
+    "app.textToImageSettings": "文生图设置",
+    "app.textToImageConfig": "文生图配置",
+    "workflow.paramErrorMissing": "参数错误：缺少 {items}"
+}

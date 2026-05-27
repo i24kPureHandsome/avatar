@@ -1,0 +1,23 @@
+{
+    "soundReplace.confirmComplete": "Confirm Completed",
+    "soundReplace.confirmText": "Confirm Text",
+    "soundReplace.confirmTextDesc": "Check and confirm the recognized text content",
+    "soundReplace.extractAndRecognize": "Extract and Recognize Audio",
+    "soundReplace.extractAndRecognizeDesc": "Select video file containing voice to replace",
+    "soundReplace.extractAudio": "Extract Audio",
+    "soundReplace.manualConfirmText": "Manually Confirm Text",
+    "soundReplace.modifyText": "Modify Text",
+    "soundReplace.reorderConfirm": "Reorder Confirm",
+    "soundReplace.reverifyText": "Reverify Text",
+    "soundReplace.saveAndSynthesize": "Save and Synthesize",
+    "soundReplace.submitTask": "Submit Task",
+    "soundReplace.synthesizeReplace": "Synthesize and Replace Voice",
+    "soundReplace.synthesizeReplaceDesc": "Set voice synthesis model parameters to generate new speech",
+    "soundReplace.taskSubmitted": "Task submitted",
+    "soundReplace.videoSynthesis": "Video Synthesis",
+    "workflow.configureRecognitionAndGeneration": "Please configure voice recognition and voice generation services",
+    "workflow.inputVideoParam": "Please input video parameter",
+    "workflow.paramErrorMissing": "Parameter error: missing {items}",
+    "workflow.soundGenerationService": "Voice generation service",
+    "workflow.soundRecognitionService": "Voice recognition service"
+}

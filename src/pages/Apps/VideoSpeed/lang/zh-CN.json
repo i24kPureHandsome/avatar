@@ -1,0 +1,7 @@
+{
+    "common.speedConfig": "变速配置",
+    "common.speedValue": "速度 {speed}x",
+    "common.playbackSpeed": "播放速度",
+    "common.customSpeed": "自定义速度",
+    "error.validPlaybackSpeed": "请设置有效的播放速度"
+}

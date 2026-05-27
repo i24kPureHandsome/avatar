@@ -1,0 +1,21 @@
+{
+    "common.second": "秒",
+    "common.noAnimation": "无动画",
+    "common.position": "位置",
+    "common.length": "长度",
+    "common.animation": "动画",
+    "common.zoomPercent": "放大%",
+    "common.zoomIn2": "放大",
+    "common.mergeConfig": "合并配置",
+    "common.positionStart": "片头",
+    "common.positionEnd": "片尾",
+    "common.positionStartImage": "片头图片",
+    "common.positionEndImage": "片尾图片",
+    "common.imageFile": "图片文件",
+    "error.validDuration": "请设置有效的片头图片时长",
+    "error.validZoomPercent": "请设置有效的放大百分比",
+    "error.selectImageFile": "请选择图片",
+    "error.inputImageParam2": "请输入图片参数",
+    "error.inputImagePositionDuration": "请输入图片位置和持续时间",
+    "error.videoInfo": "无法获取视频信息"
+}

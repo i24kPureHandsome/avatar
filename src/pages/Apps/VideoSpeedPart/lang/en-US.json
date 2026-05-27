@@ -1,0 +1,7 @@
+{
+    "common.speedMark": "Speed Mark",
+    "common.accelerationCoefficient": "Acceleration",
+    "common.accelerationValue": "Acceleration {speed}x",
+    "common.setSpeedTimeRange": "Set Speed Time Range",
+    "error.validAcceleration": "Please set a valid acceleration coefficient"
+}

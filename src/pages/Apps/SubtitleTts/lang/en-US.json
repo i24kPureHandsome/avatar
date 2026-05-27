@@ -1,0 +1,14 @@
+{
+    "subtitleTts.audioSynthesis": "Audio Synthesis",
+    "subtitleTts.parseSubtitle": "Parse Subtitle",
+    "subtitleTts.settings": "Subtitle to Audio Settings",
+    "subtitleTts.synthesizedAudio": "Synthesized Audio",
+    "app.audioSynthesis": "Audio Synthesis",
+    "app.subtitleAudioDesc": "Synthesize audio in subtitle order, with automatic speed adjustment",
+    "app.subtitleFileLabel": "Subtitle File",
+    "app.subtitleParseDesc": "Read SRT subtitle files and parse time and text",
+    "app.subtitleParseLabel": "Parse Subtitle File",
+    "app.subtitleTtsDesc": "Convert SRT subtitle file to audio",
+    "workflow.soundGenerationService": "Voice generation service",
+    "workflow.paramErrorMissing": "Parameter error: missing {items}"
+}

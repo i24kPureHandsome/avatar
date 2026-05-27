@@ -1,0 +1,13 @@
+{
+    "common.sizeConfig": "Size Config",
+    "common.fillMode": "Fill Mode",
+    "common.targetSize": "Target Size",
+    "common.selectPreset": "Select Preset Size",
+    "common.blurFill": "Blur Fill",
+    "common.blackFill": "Black Fill",
+    "common.cropFill": "Crop Fill",
+    "common.stretchFill": "Stretch Fill",
+    "error.validTargetWidth": "Please set a valid target width",
+    "error.validTargetHeight": "Please set a valid target height",
+    "error.inputSizeParam": "Please enter size parameter"
+}
