@@ -6,15 +6,15 @@ import { SoundToolApps, ToolApps, VideoProcessingApps } from "./Apps/all";
 const tab = ref("");
 
 const groups = [
-    { title: "声音处理", apps: SoundToolApps },
-    { title: "图像生成", apps: ToolApps },
+    // { title: "声音处理", apps: SoundToolApps },
+    // { title: "图像生成", apps: ToolApps },
     { title: "视频处理", apps: VideoProcessingApps },
 ];
 
 const allToolApps = [...SoundToolApps, ...ToolApps, ...VideoProcessingApps];
 
 const syncTab = () => {
-    tab.value = (Router.currentRoute.value.query.tab as string) || "SoundAsr";
+    tab.value = (Router.currentRoute.value.query.tab as string) || "TextCutVideo";
 };
 
 onMounted(() => {

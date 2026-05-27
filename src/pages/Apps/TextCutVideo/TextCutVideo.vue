@@ -357,6 +357,12 @@ const onSaveFile = async (file: string) => {
                     ]"
                 >
                     <div class="flex items-center">
+                        <a-checkbox
+                            :model-value="item.seg.include"
+                            @click.stop
+                            @change="onTextClick(item.seg)"
+                            class="mr-2 flex-shrink-0"
+                        />
                         <div
                             class="text-xs text-gray-500 font-mono select-none cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
                             @click="onTimestampClick(item.seg)"
