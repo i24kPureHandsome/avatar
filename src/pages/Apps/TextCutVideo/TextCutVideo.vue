@@ -216,8 +216,10 @@ const onOpenFile = async (file: string) => {
 
 const onSaveFile = async (file: string) => {
     const fileExt = file.split(".").pop() || "mp4";
+    const now = new Date();
+    const ts = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}_${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
     let filePath = await window.$mapi.file.openSave({
-        defaultPath: `导出视频.${fileExt}`,
+        defaultPath: `${ts}.${fileExt}`,
     });
     if (!filePath) return;
     if (!filePath.endsWith(`.${fileExt}`)) {
