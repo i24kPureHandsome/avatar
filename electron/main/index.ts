@@ -127,7 +127,6 @@ async function createWindow() {
                 const brandName = (ConfigData as any)?.appName || AppConfig.name;
                 const brandTitle = (ConfigData as any)?.appTitle || AppConfig.title;
                 const brandSlogan = (ConfigData as any)?.appSlogan || AppConfig.slogan;
-                Log.info("SplashBrand", { brandName, brandTitle, brandSlogan });
                 AppRuntime.splashWindow?.webContents.executeJavaScript(`
                     document.title = ${JSON.stringify(brandTitle)};
                     document.querySelectorAll('[data-brand]').forEach(el => {

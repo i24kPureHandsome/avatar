@@ -51,11 +51,6 @@ const allSyncFresh = () => {
     }
 };
 
-const allSync = () => {
-    loadIfNeed();
-    return data;
-};
-
 const all = async () => {
     loadIfNeed();
     return data;
@@ -125,7 +120,6 @@ ipcMain.handle("config:setEnv", async (_, key: string, value: any) => {
 
 export const ConfigMain = {
     all,
-    allSync,
     allSyncFresh,
     get,
     set,
