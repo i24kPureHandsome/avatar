@@ -145,7 +145,7 @@ defineExpose({
 
 <template>
     <div
-        v-for="item in formData.filter((i: any) => !i.opt?.includes('seed'))"
+        v-for="item in formData"
         :key="item.name"
         class="mr-2 mb-2 inline-flex items-center"
     >
