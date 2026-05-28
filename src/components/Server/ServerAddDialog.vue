@@ -249,14 +249,6 @@ const emit = defineEmits({
                                 {{ t("model.selectLocal") }}
                                 config.json
                             </a-button>
-                            <a
-                                href="https://aigcpanel.com/zh/asset"
-                                target="_blank"
-                                class="arco-btn arco-btn-secondary arco-btn-shape-square arco-btn-size-medium arco-btn-status-normal block w-full text-center py-1"
-                            >
-                                <icon-cloud />
-                                {{ t("model.download") }}
-                            </a>
                         </div>
                         <div class="mt-2">
                             <div
