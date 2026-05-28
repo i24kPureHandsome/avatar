@@ -53,7 +53,7 @@
     "voice.select": "Select Voice",
     "voice.selectFile": "Select Voice File",
     "voice.selectTimbre": "Select Timbre",
-    "voice.synthesis": "Voice Synthesis",
+    "voice.synthesis": "Voice Clone",
     "voice.synthesisConfig": "Voice Synthesis Config",
     "voice.synthesisModel": "Voice Synthesis Model",
     "voice.timbre": "Voice Timbre",

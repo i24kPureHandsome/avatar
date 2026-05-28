@@ -113,7 +113,7 @@ onMounted(async () => {
                     <div
                         class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
                     >
-                        语音合成
+                        声音克隆
                     </div>
                     <div class="text-gray-500 text-xs truncate pr-2">
                         {{ $t("intro.modelsSupported") }}
@@ -206,7 +206,6 @@ onMounted(async () => {
                 {{ $t("dashboard.statistics") }}
             </div>
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                语音合成
                 <div
                     class="flex flex-col gap-2 p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20"
                 >
@@ -216,7 +215,7 @@ onMounted(async () => {
                         ></span>
                         <span
                             class="text-xs font-medium text-gray-600 dark:text-gray-400"
-                            >语音合成</span
+                            >声音克隆</span
                         >
                     </div>
                     <div class="flex items-end gap-4">

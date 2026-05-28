@@ -53,7 +53,7 @@
     "voice.select": "选择声音",
     "voice.selectFile": "选择声音文件",
     "voice.selectTimbre": "选择音色",
-    "voice.synthesis": "语音合成",
+    "voice.synthesis": "声音克隆",
     "voice.synthesisConfig": "声音合成配置",
     "voice.synthesisModel": "声音合成模型",
     "voice.timbre": "声音音色",

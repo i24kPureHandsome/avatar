@@ -87,7 +87,7 @@
     "cli.usageInstructions": "Usage Instructions",
     "model.embeddingGroup": "Embedding Models",
     "model.freeGroup": "Free Models",
-    "model.upgradeProForCloud": "Upgrade to Pro for cloud models",
+    "model.upgradeProForCloud": "Cloud models coming soon",
     "provider.baichuan": "Baichuan",
     "provider.baiduCloud": "Baidu Cloud Qianfan",
     "provider.buildIn": "Built-in LLM",

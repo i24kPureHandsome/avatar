@@ -56,12 +56,6 @@ const onUpdate = async () => {
             @refresh="doRefresh"
         >
             <template #actions>
-                <a-button @click="cloudDialog?.show()">
-                    <template #icon>
-                        <i-mdi-cloud-download />
-                    </template>
-                    {{ $t("model.cloudAvatar") }}
-                </a-button>
                 <a-button @click="editDialog?.add()">
                     <template #icon>
                         <i-mdi-plus />

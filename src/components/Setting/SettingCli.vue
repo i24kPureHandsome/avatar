@@ -16,7 +16,7 @@ const docVisible = ref(false);
 const cliTaskDocs: Array<{ biz: string; title: string; example: string }> = [
     {
         biz: "SoundGenerate",
-        title: "语音合成",
+        title: "声音克隆",
         example: 'aigcpanel task --biz SoundGenerate --text "你好世界"',
     },
     {
