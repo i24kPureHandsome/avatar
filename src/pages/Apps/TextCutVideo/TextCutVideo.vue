@@ -640,6 +640,7 @@ const onSaveFile = async (file: string) => {
                     @click.ctrl.stop="toggleSelect(item.index)"
                 >
                     <div class="flex items-center">
+                        <span class="text-xs tcv-text-muted w-6 text-right mr-2 flex-shrink-0 tabular-nums">{{ item.index + 1 }}</span>
                         <a-checkbox
                             :model-value="item.seg.include"
                             @click.stop
