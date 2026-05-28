@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, computed, watch, onMounted } from "vue";
+import { nextTick, ref, computed, watch } from "vue";
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { TimeUtil } from "../../../lib/util";
@@ -13,24 +13,9 @@ import { TextCutVideoSegment } from "./type";
 import { textCutVideoMerge, textCutVideoSeparate } from "./util";
 import { useModelStore } from "../../../module/Model/store/model";
 import ModelSelector from "../../../module/Model/ModelSelector.vue";
-import { useSettingStore } from "../../../store/modules/setting";
 
 const serverStore = useServerStore();
 const modelStore = useModelStore();
-const setting = useSettingStore();
-
-const isDark = computed(() => setting.shouldDarkMode());
-
-const toggleTheme = () => {
-    setting.setConfig("darkMode", isDark.value ? "light" : "dark");
-};
-
-onMounted(() => {
-    if (!setting.config.darkMode) {
-        setting.setConfig("darkMode", "dark");
-    }
-    setting.setupDarkMode();
-});
 
 type Phase = "idle" | "extracting" | "recognizing" | "editing" | "exporting" | "done";
 
@@ -484,20 +469,12 @@ const onSaveFile = async (file: string) => {
 </script>
 
 <template>
-    <div :class="['h-full flex', isDark ? 'tcv-dark' : 'tcv-light']">
+    <div class="h-full flex">
         <div class="w-1/2 flex flex-col border-r tcv-border">
             <div class="tcv-header p-2 border-b tcv-border flex items-center">
                 <div class="text-sm font-medium tcv-text flex-grow">
                     {{ $t("common.preview") }}
                 </div>
-                <a-button
-                    size="mini"
-                    type="text"
-                    @click="toggleTheme"
-                >
-                    <icon-moon v-if="!isDark" />
-                    <icon-sun v-else />
-                </a-button>
                 <div v-if="videoInfo" class="text-xs tcv-text-muted">
                     {{ TimeUtil.secondsToTime(videoInfo.duration) }}
                 </div>
@@ -793,81 +770,86 @@ const onSaveFile = async (file: string) => {
 </template>
 
 <style scoped>
-.tcv-light {
-    --tcv-bg: #ffffff;
-    --tcv-bg-header: #f9fafb;
-    --tcv-bg-hover: #f3f4f6;
-    --tcv-bg-active: #eff6ff;
-    --tcv-bg-selected: #eef2ff;
-    --tcv-bg-split: #fefce8;
-    --tcv-bg-success: #f0fdf4;
-    --tcv-border-color: #e5e7eb;
-    --tcv-text-color: #1f2937;
-    --tcv-text-muted: #6b7280;
-    --tcv-text-muted-light: #9ca3af;
-    --tcv-selected-ring: #a5b4fc;
-}
-
-.tcv-dark {
-    --tcv-bg: #1a1a1a;
-    --tcv-bg-header: #232323;
-    --tcv-bg-hover: #2a2a2a;
-    --tcv-bg-active: #1e3a5f;
-    --tcv-bg-selected: #2d2d5e;
-    --tcv-bg-split: #3d3520;
-    --tcv-bg-success: #1a3a2a;
-    --tcv-border-color: #333333;
-    --tcv-text-color: #e5e5e5;
-    --tcv-text-muted: #9ca3af;
-    --tcv-text-muted-light: #6b7280;
-    --tcv-selected-ring: #6366f1;
-}
-
 .tcv-border {
-    border-color: var(--tcv-border-color);
+    border-color: #e5e7eb;
+}
+
+body[arco-theme="dark"] .tcv-border {
+    border-color: #333333;
 }
 
 .tcv-header {
-    background: var(--tcv-bg-header);
+    background: #f9fafb;
+}
+
+body[arco-theme="dark"] .tcv-header {
+    background: #232323;
 }
 
 .tcv-text {
-    color: var(--tcv-text-color);
+    color: #1f2937;
+}
+
+body[arco-theme="dark"] .tcv-text {
+    color: #e5e5e5;
 }
 
 .tcv-text-muted {
-    color: var(--tcv-text-muted);
+    color: #6b7280;
+}
+
+body[arco-theme="dark"] .tcv-text-muted {
+    color: #9ca3af;
 }
 
 .tcv-text-muted-light {
-    color: var(--tcv-text-muted-light);
+    color: #9ca3af;
+}
+
+body[arco-theme="dark"] .tcv-text-muted-light {
+    color: #6b7280;
 }
 
 .tcv-row-active {
-    background: var(--tcv-bg-active);
+    background: #eff6ff;
+}
+
+body[arco-theme="dark"] .tcv-row-active {
+    background: #1e3a5f;
 }
 
 .tcv-row-selected {
-    background: var(--tcv-bg-selected);
-    box-shadow: inset 0 0 0 1px var(--tcv-selected-ring);
+    background: #eef2ff;
+    box-shadow: inset 0 0 0 1px #a5b4fc;
+}
+
+body[arco-theme="dark"] .tcv-row-selected {
+    background: #2d2d5e;
+    box-shadow: inset 0 0 0 1px #6366f1;
 }
 
 .tcv-split-bar {
-    background: var(--tcv-bg-split);
+    background: #fefce8;
+}
+
+body[arco-theme="dark"] .tcv-split-bar {
+    background: #3d3520;
 }
 
 .tcv-success-bar {
-    background: var(--tcv-bg-success);
+    background: #f0fdf4;
 }
 
-.tcv-light .tcv-highlight :deep(mark),
-.tcv-light :deep(.tcv-highlight) {
+body[arco-theme="dark"] .tcv-success-bar {
+    background: #1a3a2a;
+}
+
+:deep(.tcv-highlight) {
     background: #fef08a;
     color: #854d0e;
 }
 
-.tcv-dark .tcv-highlight :deep(mark),
-.tcv-dark :deep(.tcv-highlight) {
+body[arco-theme="dark"] :deep(.tcv-highlight) {
     background: #854d0e;
     color: #fef08a;
 }

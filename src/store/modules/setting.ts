@@ -26,6 +26,9 @@ export const settingStore = defineStore("setting", {
             this.config = await window.$mapi.config.all();
             this.configEnv = await window.$mapi.config.allEnv();
             initAppBrand(this.config);
+            if (!this.config.darkMode) {
+                await this.setConfig("darkMode", "dark");
+            }
             this.setupDarkMode();
             // this.showGuideWhenReady().then()
             window.$mapi.app.getBuildInfo().then((info: any) => {

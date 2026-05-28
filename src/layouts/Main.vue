@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import AppQuitConfirm from "../components/AppQuitConfirm.vue";
 import { useDragWindow } from "../components/common/dragWindow";
@@ -7,8 +7,15 @@ import { AppConfig } from "../config";
 import { t } from "../lang";
 import { isDev } from "../lib/env";
 import PageNav from "./../components/PageNav.vue";
+import { useSettingStore } from "../store/modules/setting";
 
 const router = useRouter();
+const setting = useSettingStore();
+const isDark = computed(() => setting.shouldDarkMode());
+
+const toggleTheme = () => {
+    setting.setConfig("darkMode", isDark.value ? "light" : "dark");
+};
 
 const appQuitConfirm = ref<InstanceType<typeof AppQuitConfirm> | null>(null);
 const isOsx = ref(false);
@@ -83,6 +90,14 @@ const doDebugToggle = () => {
                 </div>
             </div>
             <div v-if="!isOsx" class="p-1 leading-4">
+                <div
+                    class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-primary mr-1"
+                    @click="toggleTheme"
+                    :title="isDark ? '切换亮色' : '切换暗色'"
+                >
+                    <i-mdi-weather-sunny v-if="isDark" class="text-sm" />
+                    <i-mdi-weather-night v-else class="text-sm" />
+                </div>
                 <div
                     class="inline-block w-6 h-6 leading-6 cursor-pointer hover:text-primary mr-1"
                     @click="$mapi.app.windowMin()"
