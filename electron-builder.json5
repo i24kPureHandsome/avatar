@@ -1,11 +1,11 @@
 // @see https://www.electron.build/configuration/configuration
 {
     "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-    "appId": "AigcPanel",
+    "appId": "AiAvatar",
     "publish": [],
     "asar": true,
     "npmRebuild": true,
-    "productName": "AigcPanel",
+    "productName": "AiAvatar",
     "directories": {
         "output": "dist-release",
         "buildResources": "electron/resources/build"
@@ -19,7 +19,7 @@
         icon: "electron/resources/build/logo.ico",
         "target": [
             {
-                "target": "nsis",
+                "target": "portable",
                 "arch": [
                     "x64"
                 ]
@@ -51,9 +51,9 @@
         "requestExecutionLevel": "user"
     },
     "appx": {
-        "identityName": "AigcPanel",
+        "identityName": "AiAvatar",
         "publisher": "CN=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX",
-        "publisherDisplayName": "AigcPanel",
+        "publisherDisplayName": "AiAvatar",
         "languages": [
             "zh-CN",
             "en-US",
@@ -98,7 +98,7 @@
     "linux": {
         "icon": "logo.icns",
         "desktop": "logo",
-        "maintainer": "AigcPanel",
+        "maintainer": "AiAvatar",
         "category": "Utility",
         "target": [
             {

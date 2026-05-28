@@ -11,6 +11,7 @@ import { onLocaleChange } from "./lang";
 import zhCN from "@arco-design/web-vue/es/locale/lang/zh-cn";
 import enUS from "@arco-design/web-vue/es/locale/lang/en-us";
 import { doCheckForUpdate } from "./components/common/util";
+import { AppConfig } from "./config";
 
 const locales = {
     "zh-CN": zhCN,
@@ -24,6 +25,9 @@ onLocaleChange((newLocale) => {
 
 onMounted(() => {
     setTimeout(async () => {
+        if (!AppConfig.updaterUrl) {
+            return;
+        }
         const checkAtLaunch = await window.$mapi.config.get(
             "updaterCheckAtLaunch",
             "yes",
