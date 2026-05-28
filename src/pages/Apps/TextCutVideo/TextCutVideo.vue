@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, ref, computed, watch } from "vue";
+import { nextTick, ref, computed, watch, onMounted } from "vue";
 import { t } from "../../../lang";
 import { Dialog } from "../../../lib/dialog";
 import { TimeUtil } from "../../../lib/util";
@@ -13,9 +13,25 @@ import { TextCutVideoSegment } from "./type";
 import { textCutVideoMerge, textCutVideoSeparate } from "./util";
 import { useModelStore } from "../../../module/Model/store/model";
 import ModelSelector from "../../../module/Model/ModelSelector.vue";
+import { useSettingStore } from "../../../store/modules/setting";
 
 const serverStore = useServerStore();
 const modelStore = useModelStore();
+const setting = useSettingStore();
+
+const isDark = computed(() => setting.shouldDarkMode());
+
+const toggleTheme = () => {
+    setting.setConfig("darkMode", isDark.value ? "light" : "dark");
+};
+
+onMounted(() => {
+    if (!setting.config.darkMode) {
+        setting.setConfig("darkMode", "dark");
+    }
+    setting.setupDarkMode();
+});
+
 type Phase = "idle" | "extracting" | "recognizing" | "editing" | "exporting" | "done";
 
 const phase = ref<Phase>("idle");
@@ -443,7 +459,7 @@ const highlightText = (text: string, keyword: string): string => {
     const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     return text.replace(
         new RegExp(`(${escaped})`, "gi"),
-        '<mark class="bg-yellow-200 text-yellow-900 rounded px-0.5">$1</mark>',
+        '<mark class="tcv-highlight rounded px-0.5">$1</mark>',
     );
 };
 
@@ -468,13 +484,21 @@ const onSaveFile = async (file: string) => {
 </script>
 
 <template>
-    <div class="h-full flex">
-        <div class="w-1/2 flex flex-col border-r">
-            <div class="bg-gray-50 p-2 border-b flex items-center">
-                <div class="text-sm font-medium text-gray-700 flex-grow">
+    <div :class="['h-full flex', isDark ? 'tcv-dark' : 'tcv-light']">
+        <div class="w-1/2 flex flex-col border-r tcv-border">
+            <div class="tcv-header p-2 border-b tcv-border flex items-center">
+                <div class="text-sm font-medium tcv-text flex-grow">
                     {{ $t("common.preview") }}
                 </div>
-                <div v-if="videoInfo" class="text-xs text-gray-400">
+                <a-button
+                    size="mini"
+                    type="text"
+                    @click="toggleTheme"
+                >
+                    <icon-moon v-if="!isDark" />
+                    <icon-sun v-else />
+                </a-button>
+                <div v-if="videoInfo" class="text-xs tcv-text-muted">
                     {{ TimeUtil.secondsToTime(videoInfo.duration) }}
                 </div>
                 <a-button
@@ -524,11 +548,11 @@ const onSaveFile = async (file: string) => {
         </div>
 
         <div class="w-1/2 flex flex-col">
-            <div class="bg-gray-50 p-2 border-b flex items-center gap-2">
-                <div class="text-sm font-medium text-gray-700 flex-grow">
+            <div class="tcv-header p-2 border-b tcv-border flex items-center gap-2">
+                <div class="text-sm font-medium tcv-text flex-grow">
                     {{ $t("common.segment") }}
                 </div>
-                <div v-if="segments.length > 0" class="text-xs text-gray-500">
+                <div v-if="segments.length > 0" class="text-xs tcv-text-muted">
                     {{
                         $t("common.segmentCount", {
                             include: includeCount,
@@ -538,7 +562,7 @@ const onSaveFile = async (file: string) => {
                 </div>
             </div>
 
-            <div v-if="!soundAsrConfigured" class="p-3 border-b">
+            <div v-if="!soundAsrConfigured" class="p-3 border-b tcv-border">
                 <SoundAsrForm ref="soundAsrForm" />
                 <div class="mt-2 flex">
                     <a-button
@@ -551,7 +575,7 @@ const onSaveFile = async (file: string) => {
                 </div>
             </div>
 
-            <div v-if="segments.length > 0" class="p-2 border-b flex items-center gap-2">
+            <div v-if="segments.length > 0" class="p-2 border-b tcv-border flex items-center gap-2">
                 <a-input
                     v-model="searchKeyword"
                     :placeholder="$t('common.searchText')"
@@ -574,7 +598,7 @@ const onSaveFile = async (file: string) => {
                 </a-button>
             </div>
 
-            <div v-if="segments.length > 0" class="p-2 border-b flex items-center gap-2">
+            <div v-if="segments.length > 0" class="p-2 border-b tcv-border flex items-center gap-2">
                 <ModelSelector v-model="selectedModel" style="min-width: 180px" />
                 <a-button
                     size="small"
@@ -602,12 +626,12 @@ const onSaveFile = async (file: string) => {
                 >
                     取消选择
                 </a-button>
-                <span v-if="selectedIndexes.length === 0" class="text-xs text-gray-400">Ctrl+点击选择片段合并</span>
-                <span class="text-xs text-gray-400">{{ segments.length }} 个片段</span>
+                <span v-if="selectedIndexes.length === 0" class="text-xs tcv-text-muted">Ctrl+点击选择片段合并</span>
+                <span class="text-xs tcv-text-muted">{{ segments.length }} 个片段</span>
             </div>
 
-            <div v-if="splitIndex >= 0" class="p-2 border-b bg-yellow-50 flex items-center gap-2">
-                <span class="text-xs text-gray-600">拆分位置：</span>
+            <div v-if="splitIndex >= 0" class="p-2 border-b tcv-border tcv-split-bar flex items-center gap-2">
+                <span class="text-xs tcv-text-muted">拆分位置：</span>
                 <a-input v-model="splitText" size="mini" class="flex-grow" placeholder="输入拆分点文字" />
                 <a-button size="mini" type="primary" @click="doSplit">确认拆分</a-button>
                 <a-button size="mini" @click="splitIndex = -1; splitText = ''">取消</a-button>
@@ -616,9 +640,9 @@ const onSaveFile = async (file: string) => {
             <div class="flex-grow overflow-y-auto">
                 <div
                     v-if="segments.length === 0 && !isProcessing && soundAsrConfigured"
-                    class="flex flex-col items-center justify-center h-full text-gray-400"
+                    class="flex flex-col items-center justify-center h-full tcv-text-muted"
                 >
-                    <icon-file class="text-4xl mb-2 text-gray-300" />
+                    <icon-file class="text-4xl mb-2 tcv-text-muted-light" />
                     <div v-if="!videoPath" class="text-sm">请在左侧选择视频文件</div>
                     <div v-else class="text-sm">等待识别结果...</div>
                 </div>
@@ -627,9 +651,9 @@ const onSaveFile = async (file: string) => {
                     :key="item.index"
                     :data-segment-index="item.index"
                     :class="[
-                        'border-b p-2 hover:bg-gray-50 select-text',
-                        item.index === currentIndex ? 'bg-blue-50' : '',
-                        selectedIndexes.includes(item.index) ? 'bg-indigo-50 ring-1 ring-indigo-300' : '',
+                        'border-b p-2 select-text tcv-border',
+                        item.index === currentIndex ? 'tcv-row-active' : '',
+                        selectedIndexes.includes(item.index) ? 'tcv-row-selected' : '',
                         item.matched === false && searchKeyword.trim()
                             ? 'opacity-40'
                             : '',
@@ -646,7 +670,7 @@ const onSaveFile = async (file: string) => {
                             class="mr-2 flex-shrink-0"
                         />
                         <div
-                            class="text-xs text-gray-500 font-mono cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
+                            class="text-xs tcv-text-muted font-mono cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
                             @mousedown.stop="onTimestampMouseDown($event)"
                             @mouseup.stop="onTimestampMouseUp($event, item.seg)"
                         >
@@ -699,14 +723,14 @@ const onSaveFile = async (file: string) => {
                     <div
                         v-else
                         class="text-sm mt-1"
-                        :class="item.seg.include ? 'text-gray-800' : 'text-gray-400 line-through'"
+                        :class="item.seg.include ? 'tcv-text' : 'tcv-text-muted line-through'"
                         v-html="highlightText(item.seg.text || $t('common.emptySegment'), searchKeyword)"
                     ></div>
                 </div>
             </div>
 
-            <div v-if="segments.length > 0" class="p-2 border-t flex items-center gap-3">
-                <div class="text-sm text-gray-600">
+            <div v-if="segments.length > 0" class="p-2 border-t tcv-border flex items-center gap-3">
+                <div class="text-sm tcv-text">
                     {{ $t("common.exportMode") }}:
                 </div>
                 <a-radio-group v-model="exportMode" size="small">
@@ -732,7 +756,7 @@ const onSaveFile = async (file: string) => {
 
             <div
                 v-if="phase === 'done' && exportFiles.length > 0"
-                class="p-2 border-t bg-green-50"
+                class="p-2 border-t tcv-border tcv-success-bar"
             >
                 <div class="text-sm font-medium text-green-700 mb-1">
                     导出完成
@@ -744,7 +768,7 @@ const onSaveFile = async (file: string) => {
                         class="flex items-center gap-2"
                     >
                         <icon-file class="text-green-600" />
-                        <span class="text-sm text-gray-700 flex-grow truncate">
+                        <span class="text-sm tcv-text flex-grow truncate">
                             {{ file.split(/[\\/]/).pop() }}
                         </span>
                         <a-button
@@ -767,3 +791,84 @@ const onSaveFile = async (file: string) => {
         </div>
     </div>
 </template>
+
+<style scoped>
+.tcv-light {
+    --tcv-bg: #ffffff;
+    --tcv-bg-header: #f9fafb;
+    --tcv-bg-hover: #f3f4f6;
+    --tcv-bg-active: #eff6ff;
+    --tcv-bg-selected: #eef2ff;
+    --tcv-bg-split: #fefce8;
+    --tcv-bg-success: #f0fdf4;
+    --tcv-border-color: #e5e7eb;
+    --tcv-text-color: #1f2937;
+    --tcv-text-muted: #6b7280;
+    --tcv-text-muted-light: #9ca3af;
+    --tcv-selected-ring: #a5b4fc;
+}
+
+.tcv-dark {
+    --tcv-bg: #1a1a1a;
+    --tcv-bg-header: #232323;
+    --tcv-bg-hover: #2a2a2a;
+    --tcv-bg-active: #1e3a5f;
+    --tcv-bg-selected: #2d2d5e;
+    --tcv-bg-split: #3d3520;
+    --tcv-bg-success: #1a3a2a;
+    --tcv-border-color: #333333;
+    --tcv-text-color: #e5e5e5;
+    --tcv-text-muted: #9ca3af;
+    --tcv-text-muted-light: #6b7280;
+    --tcv-selected-ring: #6366f1;
+}
+
+.tcv-border {
+    border-color: var(--tcv-border-color);
+}
+
+.tcv-header {
+    background: var(--tcv-bg-header);
+}
+
+.tcv-text {
+    color: var(--tcv-text-color);
+}
+
+.tcv-text-muted {
+    color: var(--tcv-text-muted);
+}
+
+.tcv-text-muted-light {
+    color: var(--tcv-text-muted-light);
+}
+
+.tcv-row-active {
+    background: var(--tcv-bg-active);
+}
+
+.tcv-row-selected {
+    background: var(--tcv-bg-selected);
+    box-shadow: inset 0 0 0 1px var(--tcv-selected-ring);
+}
+
+.tcv-split-bar {
+    background: var(--tcv-bg-split);
+}
+
+.tcv-success-bar {
+    background: var(--tcv-bg-success);
+}
+
+.tcv-light .tcv-highlight :deep(mark),
+.tcv-light :deep(.tcv-highlight) {
+    background: #fef08a;
+    color: #854d0e;
+}
+
+.tcv-dark .tcv-highlight :deep(mark),
+.tcv-dark :deep(.tcv-highlight) {
+    background: #854d0e;
+    color: #fef08a;
+}
+</style>

@@ -20,10 +20,7 @@ import TextCutVideoEditDialog from "./TextCutVideoEditDialog.vue";
 import VideoPreviewBox from "../../../../components/common/VideoPreviewBox.vue";
 
 const props = defineProps<{
-    record: TaskRecord<
-        TextCutVideoModelConfigType,
-        TextCutVideoJobResultType
-    >;
+    record: TaskRecord<TextCutVideoModelConfigType, TextCutVideoJobResultType>;
     dialog: boolean;
     onRefresh: () => void;
 }>();
@@ -159,9 +156,7 @@ const onEdit = async (
             <TaskJobResultStepView :record="record" step="Export">
                 <div>
                     <div
-                        v-if="
-                            record.jobResult?.Edit?.exportMode === 'separate'
-                        "
+                        v-if="record.jobResult?.Edit?.exportMode === 'separate'"
                         class="space-y-1"
                     >
                         <div

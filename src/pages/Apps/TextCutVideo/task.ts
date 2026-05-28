@@ -9,10 +9,7 @@ import {
 } from "../../../service/TaskService";
 import { useServerStore } from "../../../store/modules/server";
 import { TaskBiz, useTaskStore } from "../../../store/modules/task";
-import {
-    TextCutVideoJobResultType,
-    TextCutVideoModelConfigType,
-} from "./type";
+import { TextCutVideoJobResultType, TextCutVideoModelConfigType } from "./type";
 import { textCutVideoMerge, textCutVideoSeparate } from "./util";
 
 import { createTaskRunResult } from "../common/lib";

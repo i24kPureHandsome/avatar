@@ -51,8 +51,8 @@ const filteredRecords = computed(() => {
     }));
 });
 
-const includeCount = computed(() =>
-    currentRecords.value.filter((seg) => seg.include).length,
+const includeCount = computed(
+    () => currentRecords.value.filter((seg) => seg.include).length,
 );
 const totalCount = computed(() => currentRecords.value.length);
 
@@ -244,9 +244,7 @@ const onInvertSelection = () => {
                                 <div class="flex items-center">
                                     <div
                                         class="text-xs text-gray-600 font-mono select-none cursor-pointer hover:text-blue-600 hover:underline"
-                                        @click="
-                                            onTimestampClick(item.record)
-                                        "
+                                        @click="onTimestampClick(item.record)"
                                     >
                                         {{
                                             TimeUtil.secondsToTime(

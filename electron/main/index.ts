@@ -124,9 +124,12 @@ async function createWindow() {
         AppRuntime.splashWindow.webContents.on("did-finish-load", () => {
             try {
                 const ConfigData = ConfigMain.allSyncFresh();
-                const brandName = (ConfigData as any)?.appName || AppConfig.name;
-                const brandTitle = (ConfigData as any)?.appTitle || AppConfig.title;
-                const brandSlogan = (ConfigData as any)?.appSlogan || AppConfig.slogan;
+                const brandName =
+                    (ConfigData as any)?.appName || AppConfig.name;
+                const brandTitle =
+                    (ConfigData as any)?.appTitle || AppConfig.title;
+                const brandSlogan =
+                    (ConfigData as any)?.appSlogan || AppConfig.slogan;
                 AppRuntime.splashWindow?.webContents.executeJavaScript(`
                     document.title = ${JSON.stringify(brandTitle)};
                     document.querySelectorAll('[data-brand]').forEach(el => {
