@@ -602,6 +602,7 @@ const onSaveFile = async (file: string) => {
                 >
                     取消选择
                 </a-button>
+                <span v-if="selectedIndexes.length === 0" class="text-xs text-gray-400">Ctrl+点击选择片段合并</span>
                 <span class="text-xs text-gray-400">{{ segments.length }} 个片段</span>
             </div>
 
@@ -635,6 +636,7 @@ const onSaveFile = async (file: string) => {
                     ]"
                     @mousedown="onRowMouseDown($event)"
                     @mouseup="onRowMouseUp($event, item.seg)"
+                    @click.ctrl.stop="toggleSelect(item.index)"
                 >
                     <div class="flex items-center">
                         <a-checkbox
@@ -642,12 +644,6 @@ const onSaveFile = async (file: string) => {
                             @click.stop
                             @change="onTextClick(item.seg)"
                             class="mr-2 flex-shrink-0"
-                        />
-                        <input
-                            type="checkbox"
-                            :checked="selectedIndexes.includes(item.index)"
-                            @click.stop="toggleSelect(item.index)"
-                            class="mr-2 flex-shrink-0 accent-indigo-500"
                         />
                         <div
                             class="text-xs text-gray-500 font-mono cursor-pointer hover:text-blue-600 hover:underline flex-shrink-0"
