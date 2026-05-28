@@ -17,7 +17,13 @@ import ModelSelector from "../../../module/Model/ModelSelector.vue";
 const serverStore = useServerStore();
 const modelStore = useModelStore();
 
-type Phase = "idle" | "extracting" | "recognizing" | "editing" | "exporting" | "done";
+type Phase =
+    | "idle"
+    | "extracting"
+    | "recognizing"
+    | "editing"
+    | "exporting"
+    | "done";
 
 const phase = ref<Phase>("idle");
 const videoPath = ref("");
@@ -25,9 +31,16 @@ const soundAsrForm = ref<InstanceType<typeof SoundAsrForm>>();
 const videoRef = ref<HTMLVideoElement | null>(null);
 const soundAsrConfigured = ref(false);
 
-const videoInfo = ref<{ duration: number; width: number; height: number; fps: number } | null>(null);
+const videoInfo = ref<{
+    duration: number;
+    width: number;
+    height: number;
+    fps: number;
+} | null>(null);
 const audioFile = ref("");
-const segments = ref<(TextCutVideoSegment & { startSeconds: number; endSeconds: number })[]>([]);
+const segments = ref<
+    (TextCutVideoSegment & { startSeconds: number; endSeconds: number })[]
+>([]);
 const currentIndex = ref(-1);
 const searchKeyword = ref("");
 const exportMode = ref<"merge" | "separate">("merge");
@@ -43,7 +56,11 @@ const splitText = ref("");
 
 const filteredSegments = computed(() => {
     if (!searchKeyword.value.trim()) {
-        return segments.value.map((seg, index) => ({ seg, index, matched: false }));
+        return segments.value.map((seg, index) => ({
+            seg,
+            index,
+            matched: false,
+        }));
     }
     const keyword = searchKeyword.value.trim().toLowerCase();
     return segments.value.map((seg, index) => ({
@@ -53,10 +70,17 @@ const filteredSegments = computed(() => {
     }));
 });
 
-const includeCount = computed(() => segments.value.filter((s) => s.include).length);
+const includeCount = computed(
+    () => segments.value.filter((s) => s.include).length,
+);
 const totalCount = computed(() => segments.value.length);
 
-const isProcessing = computed(() => phase.value === "extracting" || phase.value === "recognizing" || phase.value === "exporting");
+const isProcessing = computed(
+    () =>
+        phase.value === "extracting" ||
+        phase.value === "recognizing" ||
+        phase.value === "exporting",
+);
 
 watch(videoPath, async (newVal) => {
     if (newVal && soundAsrConfigured.value) {
@@ -147,7 +171,10 @@ const doExport = async () => {
 
         let files: string[];
         if (exportMode.value === "merge") {
-            const file = await textCutVideoMerge(videoPath.value, segments.value);
+            const file = await textCutVideoMerge(
+                videoPath.value,
+                segments.value,
+            );
             files = [file];
         } else {
             files = await textCutVideoSeparate(videoPath.value, segments.value);
@@ -184,7 +211,8 @@ const doReset = () => {
 const onTimeUpdate = () => {
     const currentTime = videoRef.value?.currentTime || 0;
     const newIndex = segments.value.findIndex(
-        (seg) => seg.startSeconds <= currentTime && currentTime < seg.endSeconds,
+        (seg) =>
+            seg.startSeconds <= currentTime && currentTime < seg.endSeconds,
     );
     if (newIndex !== currentIndex.value) {
         currentIndex.value = newIndex;
@@ -201,7 +229,9 @@ const onTimeUpdate = () => {
     }
 };
 
-const onTimestampClick = (seg: TextCutVideoSegment & { startSeconds: number; endSeconds: number }) => {
+const onTimestampClick = (
+    seg: TextCutVideoSegment & { startSeconds: number; endSeconds: number },
+) => {
     if (videoRef.value) {
         videoRef.value.currentTime = seg.startSeconds;
         videoRef.value.play();
@@ -233,7 +263,10 @@ const onTimestampMouseDown = (e: MouseEvent) => {
     mouseDownTarget.value = "timestamp";
 };
 
-const onTimestampMouseUp = (e: MouseEvent, seg: TextCutVideoSegment & { startSeconds: number; endSeconds: number }) => {
+const onTimestampMouseUp = (
+    e: MouseEvent,
+    seg: TextCutVideoSegment & { startSeconds: number; endSeconds: number },
+) => {
     if (!mouseDownPos.value) return;
     const dx = Math.abs(e.clientX - mouseDownPos.value.x);
     const dy = Math.abs(e.clientY - mouseDownPos.value.y);
@@ -264,9 +297,7 @@ const doSmartMerge = async () => {
     }
     const [providerId, modelId] = selectedModel.value.split("|");
 
-    const lines = segments.value.map(
-        (seg, i) => `[${i}] ${seg.text}`,
-    );
+    const lines = segments.value.map((seg, i) => `[${i}] ${seg.text}`);
     const prompt = `以下是语音识别(ASR)产生的文字片段，按顺序排列，每个片段有序号。由于ASR断句不精确，部分片段存在以下问题：
 1. 语义不完整的地方被截断（比如"抢单"和"第四招人留人"应该是"抢单。第四招人留人"）
 2. 不该断开的地方被断开了
@@ -292,7 +323,8 @@ ${lines.join("\n")}
     smartMerging.value = true;
     try {
         const result = await modelStore.chat(providerId, modelId, prompt, {
-            systemPrompt: "你是一个专业的中文文字编辑助手，擅长修正语音识别结果的断句和标点。只返回 JSON 格式的结果，不要包含任何其他文字。",
+            systemPrompt:
+                "你是一个专业的中文文字编辑助手，擅长修正语音识别结果的断句和标点。只返回 JSON 格式的结果，不要包含任何其他文字。",
         });
         if (result.code !== 0 || !result.data?.content) {
             Dialog.tipError("AI 模型调用失败: " + (result.msg || "无响应"));
@@ -302,7 +334,10 @@ ${lines.join("\n")}
 
         let content = result.data.content.trim();
         if (/^```json/.test(content)) {
-            content = content.replace(/^```json/, "").replace(/```$/, "").trim();
+            content = content
+                .replace(/^```json/, "")
+                .replace(/```$/, "")
+                .trim();
         } else if (/^```/.test(content)) {
             content = content.replace(/^```/, "").replace(/```$/, "").trim();
         }
@@ -314,7 +349,8 @@ ${lines.join("\n")}
         }
 
         const parsed = JSON.parse(jsonMatch[0]);
-        const newSegs: { sourceIndexes: number[]; text: string }[] = parsed.segments || [];
+        const newSegs: { sourceIndexes: number[]; text: string }[] =
+            parsed.segments || [];
 
         if (newSegs.length === 0) {
             Dialog.tipSuccess("AI 分析完成，无需调整");
@@ -330,10 +366,14 @@ ${lines.join("\n")}
             return;
         }
 
-        const newSegments: (TextCutVideoSegment & { startSeconds: number; endSeconds: number })[] = [];
+        const newSegments: (TextCutVideoSegment & {
+            startSeconds: number;
+            endSeconds: number;
+        })[] = [];
         for (const seg of newSegs) {
             const first = segments.value[seg.sourceIndexes[0]];
-            const last = segments.value[seg.sourceIndexes[seg.sourceIndexes.length - 1]];
+            const last =
+                segments.value[seg.sourceIndexes[seg.sourceIndexes.length - 1]];
             newSegments.push({
                 start: first.start,
                 end: last.end,
@@ -345,7 +385,9 @@ ${lines.join("\n")}
         }
 
         segments.value = newSegments;
-        Dialog.tipSuccess(`智能断句完成，${segments.value.length} → ${newSegments.length} 个片段`);
+        Dialog.tipSuccess(
+            `智能断句完成，${segments.value.length} → ${newSegments.length} 个片段`,
+        );
     } catch (e: any) {
         Dialog.tipError("智能断句失败: " + String(e));
     }
@@ -397,7 +439,8 @@ const doSplit = () => {
     if (splitPos < 0) return;
     const ratio = seg.text.length > 0 ? splitPos / seg.text.length : 0;
     const splitTime = seg.start + (seg.end - seg.start) * ratio;
-    const splitSeconds = seg.startSeconds + (seg.endSeconds - seg.startSeconds) * ratio;
+    const splitSeconds =
+        seg.startSeconds + (seg.endSeconds - seg.startSeconds) * ratio;
     const seg1 = {
         start: seg.start,
         end: splitTime,
@@ -500,7 +543,11 @@ const onSaveFile = async (file: string) => {
                 <div
                     v-else
                     class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 text-gray-400 cursor-pointer"
-                    @click="($refs.videoFileSelector as any)?.$el?.querySelector('input')?.click()"
+                    @click="
+                        ($refs.videoFileSelector as any)?.$el
+                            ?.querySelector('input')
+                            ?.click()
+                    "
                 >
                     <icon-video-camera class="text-5xl mb-3 text-gray-500" />
                     <div class="text-lg mb-1">点击选择视频文件</div>
@@ -525,7 +572,9 @@ const onSaveFile = async (file: string) => {
         </div>
 
         <div class="w-1/2 flex flex-col">
-            <div class="tcv-header p-2 border-b tcv-border flex items-center gap-2">
+            <div
+                class="tcv-header p-2 border-b tcv-border flex items-center gap-2"
+            >
                 <div class="text-sm font-medium tcv-text flex-grow">
                     {{ $t("common.segment") }}
                 </div>
@@ -552,7 +601,10 @@ const onSaveFile = async (file: string) => {
                 </div>
             </div>
 
-            <div v-if="segments.length > 0" class="p-2 border-b tcv-border flex items-center gap-2">
+            <div
+                v-if="segments.length > 0"
+                class="p-2 border-b tcv-border flex items-center gap-2"
+            >
                 <a-input
                     v-model="searchKeyword"
                     :placeholder="$t('common.searchText')"
@@ -575,8 +627,14 @@ const onSaveFile = async (file: string) => {
                 </a-button>
             </div>
 
-            <div v-if="segments.length > 0" class="p-2 border-b tcv-border flex items-center gap-2">
-                <ModelSelector v-model="selectedModel" style="min-width: 180px" />
+            <div
+                v-if="segments.length > 0"
+                class="p-2 border-b tcv-border flex items-center gap-2"
+            >
+                <ModelSelector
+                    v-model="selectedModel"
+                    style="min-width: 180px"
+                />
                 <a-button
                     size="small"
                     type="outline"
@@ -603,24 +661,53 @@ const onSaveFile = async (file: string) => {
                 >
                     取消选择
                 </a-button>
-                <span v-if="selectedIndexes.length === 0" class="text-xs tcv-text-muted">Ctrl+点击选择片段合并</span>
-                <span class="text-xs tcv-text-muted">{{ segments.length }} 个片段</span>
+                <span
+                    v-if="selectedIndexes.length === 0"
+                    class="text-xs tcv-text-muted"
+                    >Ctrl+点击选择片段合并</span
+                >
+                <span class="text-xs tcv-text-muted"
+                    >{{ segments.length }} 个片段</span
+                >
             </div>
 
-            <div v-if="splitIndex >= 0" class="p-2 border-b tcv-border tcv-split-bar flex items-center gap-2">
+            <div
+                v-if="splitIndex >= 0"
+                class="p-2 border-b tcv-border tcv-split-bar flex items-center gap-2"
+            >
                 <span class="text-xs tcv-text-muted">拆分位置：</span>
-                <a-input v-model="splitText" size="mini" class="flex-grow" placeholder="输入拆分点文字" />
-                <a-button size="mini" type="primary" @click="doSplit">确认拆分</a-button>
-                <a-button size="mini" @click="splitIndex = -1; splitText = ''">取消</a-button>
+                <a-input
+                    v-model="splitText"
+                    size="mini"
+                    class="flex-grow"
+                    placeholder="输入拆分点文字"
+                />
+                <a-button size="mini" type="primary" @click="doSplit"
+                    >确认拆分</a-button
+                >
+                <a-button
+                    size="mini"
+                    @click="
+                        splitIndex = -1;
+                        splitText = '';
+                    "
+                    >取消</a-button
+                >
             </div>
 
             <div class="flex-grow overflow-y-auto">
                 <div
-                    v-if="segments.length === 0 && !isProcessing && soundAsrConfigured"
+                    v-if="
+                        segments.length === 0 &&
+                        !isProcessing &&
+                        soundAsrConfigured
+                    "
                     class="flex flex-col items-center justify-center h-full tcv-text-muted"
                 >
                     <icon-file class="text-4xl mb-2 tcv-text-muted-light" />
-                    <div v-if="!videoPath" class="text-sm">请在左侧选择视频文件</div>
+                    <div v-if="!videoPath" class="text-sm">
+                        请在左侧选择视频文件
+                    </div>
                     <div v-else class="text-sm">等待识别结果...</div>
                 </div>
                 <div
@@ -630,7 +717,9 @@ const onSaveFile = async (file: string) => {
                     :class="[
                         'border-b p-2 select-text tcv-border',
                         item.index === currentIndex ? 'tcv-row-active' : '',
-                        selectedIndexes.includes(item.index) ? 'tcv-row-selected' : '',
+                        selectedIndexes.includes(item.index)
+                            ? 'tcv-row-selected'
+                            : '',
                         item.matched === false && searchKeyword.trim()
                             ? 'opacity-40'
                             : '',
@@ -640,7 +729,10 @@ const onSaveFile = async (file: string) => {
                     @click.ctrl.stop="toggleSelect(item.index)"
                 >
                     <div class="flex items-center">
-                        <span class="text-xs tcv-text-muted w-6 text-right mr-2 flex-shrink-0 tabular-nums">{{ item.index + 1 }}</span>
+                        <span
+                            class="text-xs tcv-text-muted w-6 text-right mr-2 flex-shrink-0 tabular-nums"
+                            >{{ item.index + 1 }}</span
+                        >
                         <a-checkbox
                             :model-value="item.seg.include"
                             @click.stop
@@ -652,9 +744,19 @@ const onSaveFile = async (file: string) => {
                             @mousedown.stop="onTimestampMouseDown($event)"
                             @mouseup.stop="onTimestampMouseUp($event, item.seg)"
                         >
-                            {{ TimeUtil.secondsToTime(item.seg.startSeconds, true) }}
+                            {{
+                                TimeUtil.secondsToTime(
+                                    item.seg.startSeconds,
+                                    true,
+                                )
+                            }}
                             -
-                            {{ TimeUtil.secondsToTime(item.seg.endSeconds, true) }}
+                            {{
+                                TimeUtil.secondsToTime(
+                                    item.seg.endSeconds,
+                                    true,
+                                )
+                            }}
                         </div>
                         <div class="flex-grow"></div>
                         <a-button
@@ -669,7 +771,10 @@ const onSaveFile = async (file: string) => {
                             v-if="editingIndex !== item.index"
                             size="mini"
                             type="text"
-                            @click.stop="splitIndex = item.index; splitText = ''"
+                            @click.stop="
+                                splitIndex = item.index;
+                                splitText = '';
+                            "
                         >
                             <icon-scissors />
                         </a-button>
@@ -695,19 +800,35 @@ const onSaveFile = async (file: string) => {
                             @keydown.enter="doSaveEdit"
                             @keydown.escape="doCancelEdit"
                         />
-                        <a-button size="mini" type="primary" @click="doSaveEdit">保存</a-button>
-                        <a-button size="mini" @click="doCancelEdit">取消</a-button>
+                        <a-button size="mini" type="primary" @click="doSaveEdit"
+                            >保存</a-button
+                        >
+                        <a-button size="mini" @click="doCancelEdit"
+                            >取消</a-button
+                        >
                     </div>
                     <div
                         v-else
                         class="text-sm mt-1"
-                        :class="item.seg.include ? 'tcv-text' : 'tcv-text-muted line-through'"
-                        v-html="highlightText(item.seg.text || $t('common.emptySegment'), searchKeyword)"
+                        :class="
+                            item.seg.include
+                                ? 'tcv-text'
+                                : 'tcv-text-muted line-through'
+                        "
+                        v-html="
+                            highlightText(
+                                item.seg.text || $t('common.emptySegment'),
+                                searchKeyword,
+                            )
+                        "
                     ></div>
                 </div>
             </div>
 
-            <div v-if="segments.length > 0" class="p-2 border-t tcv-border flex items-center gap-3">
+            <div
+                v-if="segments.length > 0"
+                class="p-2 border-t tcv-border flex items-center gap-3"
+            >
                 <div class="text-sm tcv-text">
                     {{ $t("common.exportMode") }}:
                 </div>

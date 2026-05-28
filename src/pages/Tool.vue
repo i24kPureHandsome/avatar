@@ -14,7 +14,8 @@ const groups = [
 const allToolApps = [...SoundToolApps, ...ToolApps, ...VideoProcessingApps];
 
 const syncTab = () => {
-    tab.value = (Router.currentRoute.value.query.tab as string) || "TextCutVideo";
+    tab.value =
+        (Router.currentRoute.value.query.tab as string) || "TextCutVideo";
 };
 
 onMounted(() => {

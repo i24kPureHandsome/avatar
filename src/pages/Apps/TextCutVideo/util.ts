@@ -11,21 +11,37 @@ const clipArgs = (
 ): string[] => {
     if (reencode) {
         return [
-            "-i", videoPath,
-            "-ss", startTime.toString(),
-            "-to", endTime.toString(),
-            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "18",
-            "-c:a", "aac",
-            "-force_key_frames", "expr:gte(t,n_forced*0.5)",
-            "-y", outputFile,
+            "-i",
+            videoPath,
+            "-ss",
+            startTime.toString(),
+            "-to",
+            endTime.toString(),
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-crf",
+            "18",
+            "-c:a",
+            "aac",
+            "-force_key_frames",
+            "expr:gte(t,n_forced*0.5)",
+            "-y",
+            outputFile,
         ];
     }
     return [
-        "-i", videoPath,
-        "-ss", startTime.toString(),
-        "-to", endTime.toString(),
-        "-c", "copy",
-        "-y", outputFile,
+        "-i",
+        videoPath,
+        "-ss",
+        startTime.toString(),
+        "-to",
+        endTime.toString(),
+        "-c",
+        "copy",
+        "-y",
+        outputFile,
     ];
 };
 
@@ -70,11 +86,16 @@ export const textCutVideoMerge = async (
     await $mapi.file.write(txtFile, lines.join("\n"));
     await ffmpegOptimized(
         [
-            "-f", "concat",
-            "-safe", "0",
-            "-i", txtFile,
-            "-c", "copy",
-            "-y", outputFile,
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            txtFile,
+            "-c",
+            "copy",
+            "-y",
+            outputFile,
         ],
         { successFileCheck: outputFile },
     );

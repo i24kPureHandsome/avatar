@@ -21,8 +21,7 @@
             {
                 "target": "nsis",
                 "arch": [
-                    "x64",
-                    "arm64"
+                    "x64"
                 ]
             },
         ],
@@ -94,7 +93,7 @@
         "notarize": false,
         "darkModeSupport": false,
         "hardenedRuntime": true,
-        "identity": "Xi'an Yanyi Information Technology Co., Ltd (Q96H3H33RK)"
+        "identity": "Jiangsu Xuzhou"
     },
     "linux": {
         "icon": "logo.icns",

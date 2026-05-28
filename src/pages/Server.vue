@@ -114,31 +114,6 @@ const typeName = (type: string) => {
                         </template>
                         {{ $t("model.addCloud") }}
                     </a-button>
-                    <a-button class="mx-1" @click="helpShow = true">
-                        <template #icon>
-                            <icon-book class="mr-1" />
-                        </template>
-                        {{ $t("help.howToAddModel") }}
-                    </a-button>
-                </div>
-                <div v-if="helpShow" class="pt-5 text-center">
-                    <div
-                        class="inline-block bg-gray-100 text-left rounded-lg p-6 leading-8"
-                    >
-                        <div>① {{ $t("model.marketTip") }}</div>
-                        <div>② {{ $t("model.unzipTip") }}</div>
-                        <div class="pt-3">
-                            {{ $t("msg.moreContent") }}
-                            <a
-                                href="javascript:;"
-                                class="text-link"
-                                @click="doHelp"
-                            >
-                                <icon-book />
-                                {{ $t("common.onlineDocs") }}
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div v-else class="flex flex-wrap -mx-2">
