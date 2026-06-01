@@ -958,4 +958,4 @@ git commit -m "fix(liveportrait): fix typecheck errors for drive mode support"
 
 - `formData.driveMode` 类型为 `"audio" | "video"`，在 VideoGenCreate.vue 和 VideoGen.ts 中一致使用
 - `formData.drivingVideoFile` 类型为 `string`，通过 `modelConfig.drivingVideoFile` 传递到 VideoGen.ts
-- VideoGen.ts 中 `modelConfig` 使用 `any` 类型访问新字段，不需要修改类型定义（现有代码也是这样使用的）
+- `VideoGenModelConfigType` 在任务 5 中扩展了 `driveMode?` 和 `drivingVideoFile?` 可选字段，VideoGen.ts 中通过 `modelConfig.driveMode` 和 `modelConfig.drivingVideoFile` 访问，类型安全
