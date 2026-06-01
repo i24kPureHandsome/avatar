@@ -27,8 +27,10 @@
 |------|------|----------|
 | `src/pages/Video/components/VideoGenCreate.vue` | 数字人合成创建表单 | 增加 driveMode 选择和 drivingVideoFile 上传 |
 | `src/task/VideoGen.ts` | VideoGen 任务执行逻辑 | 支持传递 drivingVideo 参数给 server |
+| `src/declarations/app.d.ts` | TypeScript 类型声明 | 扩展 VideoGenModelConfigType 增加 driveMode 和 drivingVideoFile |
 | `src/pages/Video/locales/zh-CN.json` | 中文翻译 | 新增驱动方式相关翻译键 |
 | `src/pages/Video/locales/en-US.json` | 英文翻译 | 新增驱动方式相关翻译键 |
+| `src/pages/Video/components/VideoGenFormViewBody.vue` | 任务历史展示组件 | 展示驱动模式标签 |
 
 ### 不修改的文件（说明）
 
@@ -36,6 +38,10 @@
 
 - `electron/aigcserver/EasyServer.ts` — videoGen 的 configCalculator 中 `data.audio` 字段对于视频驱动模式会传入视频文件路径，launcher.py 根据文件扩展名判断是音频还是视频，不需要新增字段。这样避免修改 Electron 层代码。
 - `electron/mapi/httpserver/main.ts` — 同理，不需要新增字段。
+
+### 不修改但需确认兼容性的文件
+
+- `src/pages/Apps/VideoGenFlow/components/VideoGenFlowCreate.vue` — 这是"数字人一键合成"流程（文本→音频→视频），始终是音频驱动模式，不受本次变更影响。它使用 `VideoGenForm` 组件选择模型和形象，但不使用 `VideoGenCreate.vue`，因此不需要修改。
 
 ---
 
@@ -54,10 +60,11 @@
     "title": "LivePortrait",
     "version": "1.0.0",
     "entry": "__EasyServer__",
+    "description": "快手开源的高效人像动画模型，支持音频和视频驱动",
     "functions": ["videoGen"],
     "easyServer": {
-        "entry": "launcher",
-        "entryArgs": ["${CONFIG}"],
+        "entry": "python",
+        "entryArgs": ["launcher.py", "${CONFIG}"],
         "envs": [],
         "content": "快手开源的高效人像动画模型，支持音频和视频驱动口型同步。基于 stitching 和 retargeting control 实现精准的人像动画。",
         "functions": {
@@ -132,7 +139,6 @@ import json
 import base64
 import os
 import subprocess
-import glob
 
 
 def log(msg):
@@ -182,6 +188,13 @@ def main():
 
     output_dir = os.path.join(root_dir, "animations")
     os.makedirs(output_dir, exist_ok=True)
+
+    for f in os.listdir(output_dir):
+        if f.endswith(".mp4"):
+            try:
+                os.remove(os.path.join(output_dir, f))
+            except OSError:
+                pass
 
     cmd = [sys.executable, inference_script, "-s", video_source, "-d", driving_input]
 
@@ -239,7 +252,7 @@ if __name__ == "__main__":
 
 **关键设计决策**：
 - `model_config["audio"]` 字段在 AIGCPanel 中传递音频文件路径，但 LivePortrait 的 `-d` 参数原生支持 `.wav` 音频和 `.mp4` 视频文件。launcher.py 不做类型判断，直接将 `audio` 字段的值传递给 `-d` 参数，LivePortrait 会根据文件扩展名自动处理。
-- 对于视频驱动模式，前端会将视频文件路径放入 `modelConfig.drivingVideoFile`，launcher.py 会优先使用 `drivingVideo` 字段（如果存在），否则使用 `audio` 字段。
+- 对于视频驱动模式，前端 VideoGenCreate.vue 将视频文件路径存入 `modelConfig.drivingVideoFile`，VideoGen.ts 的 runFunc 将 `drivingVideoFile` 赋值给 `audioFile` 变量，最终通过 `data.audio` 传递给 EasyServer。launcher.py 统一从 `model_config["audio"]` 读取驱动源，无需关心是音频还是视频。
 
 - [ ] **步骤 2：验证 launcher.py 语法**
 
@@ -679,7 +692,57 @@ git commit -m "feat(liveportrait): add drive mode selection (audio/video) to Vid
 
 ---
 
-## 任务 5：修改 VideoGen.ts 任务执行逻辑
+## 任务 5：修改 VideoGenModelConfigType 类型声明
+
+**文件：**
+- 修改：`src/declarations/app.d.ts`
+
+**目标：** 扩展 `VideoGenModelConfigType` 类型，添加 `driveMode` 和 `drivingVideoFile` 字段，否则 VideoGen.ts 中访问这些字段会产生 TypeScript 编译错误。
+
+- [ ] **步骤 1：修改 VideoGenModelConfigType 类型定义**
+
+找到 `app.d.ts` 中的 `VideoGenModelConfigType` 定义：
+
+```typescript
+declare type VideoGenModelConfigType = {
+    videoTemplateId: number;
+    videoTemplateName: string;
+    videoTemplateUrl: string;
+    soundType: "soundGenerate" | "soundCustom";
+    soundGenerateId: number;
+    soundGenerateText: string;
+    soundCustomFile: string;
+};
+```
+
+替换为：
+
+```typescript
+declare type VideoGenModelConfigType = {
+    videoTemplateId: number;
+    videoTemplateName: string;
+    videoTemplateUrl: string;
+    soundType: "soundGenerate" | "soundCustom";
+    soundGenerateId: number;
+    soundGenerateText: string;
+    soundCustomFile: string;
+    driveMode?: "audio" | "video";
+    drivingVideoFile?: string;
+};
+```
+
+`driveMode` 和 `drivingVideoFile` 标记为可选（`?`），因为旧的任务记录不包含这些字段。
+
+- [ ] **步骤 2：Commit**
+
+```bash
+git add src/declarations/app.d.ts
+git commit -m "feat(liveportrait): extend VideoGenModelConfigType with drive mode fields"
+```
+
+---
+
+## 任务 6：修改 VideoGen.ts 任务执行逻辑
 
 **文件：**
 - 修改：`src/task/VideoGen.ts`
@@ -752,7 +815,7 @@ git commit -m "feat(liveportrait): support video drive mode in VideoGen task"
 
 ---
 
-## 任务 6：更新国际化翻译文件
+## 任务 7：更新国际化翻译文件
 
 **文件：**
 - 修改：`src/pages/Video/locales/zh-CN.json`
@@ -791,7 +854,7 @@ git commit -m "feat(liveportrait): add i18n keys for drive mode selection"
 
 ---
 
-## 任务 7：更新 VideoGenFormViewBody 展示驱动模式
+## 任务 8：更新 VideoGenFormViewBody 展示驱动模式
 
 **文件：**
 - 修改：`src/pages/Video/components/VideoGenFormViewBody.vue`
@@ -839,7 +902,7 @@ git commit -m "feat(liveportrait): show drive mode tag in task history"
 
 ---
 
-## 任务 8：构建验证
+## 任务 9：构建验证
 
 - [ ] **步骤 1：运行 lint/typecheck**
 
@@ -880,10 +943,11 @@ git commit -m "fix(liveportrait): fix typecheck errors for drive mode support"
 | 创建 launcher.py | 任务 2 |
 | 创建 setup.sh / setup.bat | 任务 3 |
 | 前端增加驱动方式选择 | 任务 4 |
-| 后端支持 drivingVideo 参数 | 任务 5（通过 audio 字段传递） |
-| 国际化翻译 | 任务 6 |
-| 任务历史展示驱动模式 | 任务 7 |
-| 构建验证 | 任务 8 |
+| 扩展类型声明 | 任务 5 |
+| 后端支持 drivingVideo 参数 | 任务 6（通过 audio 字段传递） |
+| 国际化翻译 | 任务 7 |
+| 任务历史展示驱动模式 | 任务 8 |
+| 构建验证 | 任务 9 |
 
 ### 占位符扫描
 
