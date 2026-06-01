@@ -113,6 +113,14 @@ export const VideoApps = [
         color: "#f59e0b",
         component: VideoGenFlow,
     },
+    // {
+    //     name: "VideoGenFlow",
+    //     title: t("avatar.oneClickSynthesis"),
+    //     description: t("intro.textToVideo"),
+    //     icon: VideoGenFlowIcon,
+    //     color: "#f59e0b",
+    //     component: VideoGenFlow,
+    // },
 ];
 
 export const ToolApps = [
@@ -296,11 +304,7 @@ export const VideoProcessingApps = [
 ];
 
 export const AllApps = [
-    ...(SoundApps.map((app) => ({
-        ...app,
-        url: `/video?tab=${app.name}`,
-    })) as any),
-    ...(SoundToolApps.map((app) => ({
+    ...(VideoApps.map((app) => ({
         ...app,
         url: `/tool?tab=${app.name}`,
     })) as any),
@@ -312,10 +316,4 @@ export const AllApps = [
         ...app,
         url: `/tool?tab=${app.name}`,
     })) as any),
-    // {
-    //     title: t("feedback.toolRequest"),
-    //     description: t("msg.moreTools"),
-    //     icon: FeedbackIcon,
-    //     url: "https://aigcpanel.com/wish",
-    // },
 ];

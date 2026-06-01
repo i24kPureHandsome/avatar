@@ -26,7 +26,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
         <div
             class="p-6 w-52 flex-shrink-0 border-r border-solid border-gray-100 overflow-x-hidden overflow-y-auto"
         >
-            <div class="text-xs text-gray-400 mb-2 uppercase">声音</div>
+            <div class="text-xs text-gray-400 mb-2 uppercase">声音克隆</div>
             <div
                 class="p-2 rounded-lg mb-2 cursor-pointer"
                 :class="tab === 'soundGenerate' ? 'bg-gray-200' : ''"
@@ -39,7 +39,7 @@ watch(() => Router.currentRoute.value.query.tab, syncTab);
                     {{ t("voice.synthesis") }}
                 </div>
             </div>
-            <div class="text-xs text-gray-400 mb-2 mt-4 uppercase">视频</div>
+            <div class="text-xs text-gray-400 mb-2 mt-4 uppercase">数字人</div>
             <div
                 class="p-2 rounded-lg mb-2 cursor-pointer"
                 :class="tab === 'videoTemplate' ? 'bg-gray-200' : ''"

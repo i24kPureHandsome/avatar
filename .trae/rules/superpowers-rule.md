@@ -1,3 +1,4 @@
 - 如果使用了SKILLS：superpowers-zh或superpowers，请一定要切换到.worktrees下对应的目录，并且git也一并切换到对应的分支，进行代码的增删改查操作。绝对不能造成修改、新增、删除等已变动的内容丢失。
 - writing-plans时请先检查有没有worktrees，如果没有则先using-git-worktrees创建worktrees，再writing-plans。
 - chinese-code-review 代码审查请不要浮于表面，要深入仔细负责的检查本次计划设计的所有代码，不要糊弄，不要阿附奉承，请深入、仔细、负责的检查。
+- receiving-code-review 技术严谨的处理审查反馈请不要浮于表面，要深入仔细负责的检查本次本次代码审查的结果，不要糊弄，不要阿附奉承，请深入、仔细、负责的检查。

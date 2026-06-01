@@ -80,14 +80,14 @@ const doDebugToggle = () => {
                 <div class="pl-2 py-2">
                     <img src="/logo.svg" class="w-4 t-4" />
                 </div>
-                <div class="p-2 flex-grow">
+                <!-- <div class="p-2 flex-grow">
                     {{ AppConfig.title }}
                     <span
                         v-if="appEditionBadge"
                         class="bg-gray-200 text-gray-500 rounded-lg px-1 inline-block text-xs ml-1"
                         >{{ appEditionBadge }}</span
                     >
-                </div>
+                </div> -->
             </div>
             <div v-if="!isOsx" class="p-1 leading-4">
                 <div

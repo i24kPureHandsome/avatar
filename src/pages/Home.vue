@@ -134,7 +134,7 @@ onMounted(async () => {
                     <div
                         class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
                     >
-                        数字人合成
+                        数字人
                     </div>
                     <div class="text-gray-500 text-xs truncate pr-2">
                         {{ $t("avatar.audioToVideo") }}

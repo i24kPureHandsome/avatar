@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import Router from "../router";
-import { SoundToolApps, ToolApps, VideoProcessingApps } from "./Apps/all";
+import { SoundToolApps, ToolApps, VideoProcessingApps, VideoApps } from "./Apps/all";
 
 const tab = ref("");
 
 const groups = [
     // { title: "声音处理", apps: SoundToolApps },
     // { title: "图像生成", apps: ToolApps },
-    { title: "视频处理", apps: VideoProcessingApps },
+    // { title: "视频处理", apps: VideoProcessingApps },
+    { title: "视频工具", apps: VideoApps },
 ];
 
-const allToolApps = [...SoundToolApps, ...ToolApps, ...VideoProcessingApps];
+// const allToolApps = [...SoundToolApps, ...ToolApps, ...VideoProcessingApps];
+const allToolApps = [...VideoApps];
 
 const syncTab = () => {
     tab.value =

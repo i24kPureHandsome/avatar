@@ -118,8 +118,8 @@
     "cli.pathHintLinux": "若 ~/.local/bin 不在 PATH 中，请添加 export PATH=\"$HOME/.local/bin:$PATH\" 到 shell 配置文件",
     "cli.commentViewVersion": "# 查看版本",
     "cli.commentListModels": "# 列出已安装服务",
-    "cli.commentCallFunction": "# 调用服务功能（示例：语音合成）",
+    "cli.commentCallFunction": "# 调用服务功能（示例：声音克隆）",
     "cli.winCommentViewVersion": ":: 查看版本",
     "cli.winCommentListModels": ":: 列出已安装服务",
-    "cli.winCommentCallFunction": ":: 调用服务功能（示例：语音合成）"
+    "cli.winCommentCallFunction": ":: 调用服务功能（示例：声音克隆）"
 }
