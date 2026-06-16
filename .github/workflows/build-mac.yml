@@ -24,10 +24,44 @@ jobs:
       - name: Build macOS arm64
         run: npx electron-builder --mac --arm64 --publish never
 
-      - name: Upload artifacts
+      - name: Upload to Gitee Release
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          OWNER="Spacetime-Ripple"
+          REPO="ai-avatar"
+          TAG="latest"
+          API="https://gitee.com/api/v5/repos/$OWNER/$REPO/releases"
+          
+          # Try to get existing release, create if not exists
+          RELEASE_ID=$(curl -s "$API/tags/$TAG?access_token=$GITEE_TOKEN" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+          
+          if [ -z "$RELEASE_ID" ]; then
+            echo "Creating new release..."
+            RELEASE_ID=$(curl -s -X POST "$API" \
+              -H "Content-Type: application/json" \
+              -d "{\"access_token\":\"$GITEE_TOKEN\",\"tag_name\":\"$TAG\",\"name\":\"macOS 构建\",\"body\":\"最新 macOS 构建\",\"target_commitish\":\"master\"}" \
+              | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+          fi
+          
+          echo "Release ID: $RELEASE_ID"
+          
+          # Upload all dmg files
+          for file in dist-release/*.dmg; do
+            filename=$(basename "$file")
+            echo "Uploading $filename..."
+            curl -s -X POST "https://gitee.com/api/v5/repos/$OWNER/$REPO/releases/$RELEASE_ID/attach_files" \
+              -H "Content-Type: multipart/form-data" \
+              -F "access_token=$GITEE_TOKEN" \
+              -F "file=@$file" \
+              | grep -o '"name":"[^"]*"'
+          done
+          
+          echo "Upload complete!"
+
+      - name: Upload artifacts (GitHub backup)
         uses: actions/upload-artifact@v4
         with:
           name: macos-arm64-build
           path: |
             dist-release/*.dmg
-            dist-release/*.zip
