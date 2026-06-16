@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import Router from "../router";
-import { SoundToolApps, ToolApps, VideoProcessingApps, VideoApps } from "./Apps/all";
+import {
+    SoundToolApps,
+    ToolApps,
+    VideoProcessingApps,
+    VideoApps,
+} from "./Apps/all";
 
 const tab = ref("");
 
