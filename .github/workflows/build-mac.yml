@@ -33,28 +33,41 @@ jobs:
           TAG="latest"
           API="https://gitee.com/api/v5/repos/$OWNER/$REPO/releases"
           
-          # Try to get existing release, create if not exists
-          RELEASE_ID=$(curl -s "$API/tags/$TAG?access_token=$GITEE_TOKEN" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+          # Check if release exists
+          echo "Checking for existing release..."
+          RESP=$(curl -s -w "\n%{http_code}" "$API/tags/$TAG?access_token=$GITEE_TOKEN")
+          HTTP_CODE=$(echo "$RESP" | tail -1)
+          BODY=$(echo "$RESP" | sed '$d')
+          echo "HTTP status: $HTTP_CODE"
           
-          if [ -z "$RELEASE_ID" ]; then
+          if [ "$HTTP_CODE" = "200" ]; then
+            RELEASE_ID=$(echo "$BODY" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+            echo "Found existing release ID: $RELEASE_ID"
+            # Delete old assets
+            echo "Deleting old assets..."
+            ASSETS=$(echo "$BODY" | python3 -c "import sys,json; [print(a['id']) for a in json.load(sys.stdin).get('assets',[])]")
+            for aid in $ASSETS; do
+              curl -s -X DELETE "https://gitee.com/api/v5/repos/$OWNER/$REPO/releases/$RELEASE_ID/attach_files/$aid?access_token=$GITEE_TOKEN"
+            done
+          else
             echo "Creating new release..."
-            RELEASE_ID=$(curl -s -X POST "$API" \
+            CREATE_RESP=$(curl -s -X POST "$API" \
               -H "Content-Type: application/json" \
-              -d "{\"access_token\":\"$GITEE_TOKEN\",\"tag_name\":\"$TAG\",\"name\":\"macOS 构建\",\"body\":\"最新 macOS 构建\",\"target_commitish\":\"master\"}" \
-              | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+              -d "{\"access_token\":\"$GITEE_TOKEN\",\"tag_name\":\"$TAG\",\"name\":\"macOS 构建\",\"body\":\"最新 macOS 构建\",\"target_commitish\":\"master\"}")
+            echo "Create response: $CREATE_RESP"
+            RELEASE_ID=$(echo "$CREATE_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+            echo "Created release ID: $RELEASE_ID"
           fi
-          
-          echo "Release ID: $RELEASE_ID"
           
           # Upload all dmg files
           for file in dist-release/*.dmg; do
             filename=$(basename "$file")
             echo "Uploading $filename..."
-            curl -s -X POST "https://gitee.com/api/v5/repos/$OWNER/$REPO/releases/$RELEASE_ID/attach_files" \
+            UPLOAD_RESP=$(curl -s -X POST "https://gitee.com/api/v5/repos/$OWNER/$REPO/releases/$RELEASE_ID/attach_files" \
               -H "Content-Type: multipart/form-data" \
               -F "access_token=$GITEE_TOKEN" \
-              -F "file=@$file" \
-              | grep -o '"name":"[^"]*"'
+              -F "file=@$file")
+            echo "Upload response: $UPLOAD_RESP"
           done
           
           echo "Upload complete!"
