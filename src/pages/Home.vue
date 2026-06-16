@@ -28,7 +28,15 @@ const doUrl = (url: string) => {
     if (url.startsWith("http")) {
         window.$mapi.app.openExternal(url);
     } else {
-        Router.push(url);
+        const [path, queryStr] = url.split("?");
+        const query: Record<string, string> = {};
+        if (queryStr) {
+            for (const pair of queryStr.split("&")) {
+                const [key, val] = pair.split("=");
+                query[key] = val;
+            }
+        }
+        Router.push({ path, query });
     }
 };
 
@@ -149,22 +157,22 @@ onMounted(async () => {
             <div
                 class="bg-white dark:bg-gray-800 rounded-xl p-5 cursor-pointer hover:shadow-md border border-gray-100 dark:border-gray-700 transition-all group flex items-center justify-between relative overflow-hidden"
                 data-nav="tool"
-                @click="$router.push('/tool')"
+                @click="$router.push('/tool?tab=TextCutVideo')"
             >
                 <div class="flex-grow z-10 w-0">
                     <div
                         class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1"
                     >
-                        小工具
+                        文本剪辑
                     </div>
                     <div class="text-gray-500 text-xs truncate pr-2">
-                        视频音频处理工具集
+                        语音识别提取视频文字，搜索定位剪辑
                     </div>
                 </div>
                 <div
-                    class="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
+                    class="w-12 h-12 rounded-full bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300"
                 >
-                    <icon-tool class="text-amber-500 text-2xl" />
+                    <i-mdi-text-box-search class="text-violet-500 text-2xl" />
                 </div>
             </div>
 

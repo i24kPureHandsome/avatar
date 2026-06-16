@@ -18,7 +18,7 @@ const activeTab = computed(() => {
     if (path === "/setting") return "setting";
     if (path === "/video") return "video";
     if (path === "/live") return "live";
-    if (path === "/tool") return "tool";
+    if (path.startsWith("/tool")) return "tool";
     if (path.startsWith("/workflow")) return "workflow";
 });
 
@@ -128,13 +128,13 @@ const doUser = async () => {
             <a
                 class="page-nav-item block text-center py-3"
                 :class="activeTab === 'tool' ? 'active' : ''"
-                @click="$router.push('/tool')"
+                @click="$router.push('/tool?tab=TextCutVideo')"
                 href="javascript:;"
             >
                 <div class="flex justify-center">
-                    <icon-tool class="text-xl" />
+                    <i-mdi-text-box-search class="text-xl" />
                 </div>
-                <div class="text-sm">小工具</div>
+                <div class="text-sm">文本剪辑</div>
             </a>
             <!-- 隐藏：工作流菜单
             <a

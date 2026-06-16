@@ -105,22 +105,6 @@ export const VideoApps = [
             () => import("./TextCutVideo/TextCutVideo.vue"),
         ),
     },
-    {
-        name: "VideoGenFlow",
-        title: t("avatar.oneClickSynthesis"),
-        description: t("intro.textToVideo"),
-        icon: VideoGenFlowIcon,
-        color: "#f59e0b",
-        component: VideoGenFlow,
-    },
-    // {
-    //     name: "VideoGenFlow",
-    //     title: t("avatar.oneClickSynthesis"),
-    //     description: t("intro.textToVideo"),
-    //     icon: VideoGenFlowIcon,
-    //     color: "#f59e0b",
-    //     component: VideoGenFlow,
-    // },
 ];
 
 export const ToolApps = [
@@ -143,16 +127,6 @@ export const ToolApps = [
 ];
 
 export const VideoProcessingApps = [
-    {
-        name: "TextCutVideo",
-        title: "文本剪辑视频",
-        description: "通过语音识别提取视频文字内容，支持搜索定位、勾选剪辑",
-        icon: TextCutVideoIcon,
-        color: "#8b5cf6",
-        component: defineAsyncComponent(
-            () => import("./TextCutVideo/TextCutVideo.vue"),
-        ),
-    },
     // {
     //     name: "VideoBackground",
     //     title: "视频背景添加",
