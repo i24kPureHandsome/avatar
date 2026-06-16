@@ -1,0 +1,138 @@
+从零开始：Mac 构建完整指南
+=====================================
+
+适用：全新 Mac（M1/M2/M3/M4 芯片），没有任何开发环境。
+
+-------------------------------------
+
+第一步：安装 Homebrew（包管理器）
+-------------------------------------
+打开"终端"（Terminal），粘贴执行：
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+安装完成后，根据终端提示把 Homebrew 加入 PATH。
+Apple Silicon (M1/M2/M3/M4) 的提示类似：
+
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+验证：
+brew --version
+
+
+-------------------------------------
+第二步：安装 Node.js
+-------------------------------------
+brew install node@20
+
+验证：
+node --version    （应显示 v20.x.x）
+npm --version     （应显示 10.x.x）
+
+
+-------------------------------------
+第三步：安装 Git
+-------------------------------------
+macOS 自带 Git，但版本较旧。更新一下：
+brew install git
+
+验证：
+git --version
+
+
+-------------------------------------
+第四步：拉取代码
+-------------------------------------
+cd ~
+git clone https://gitee.com/Spacetime-Ripple/ai-avatar.git
+cd ai-avatar
+
+
+-------------------------------------
+第五步：安装项目依赖
+-------------------------------------
+npm install
+
+这会下载约 1000+ 个包，需要几分钟。
+
+如果报权限错误，不要用 sudo，改用：
+npm config set prefix ~/.npm-global
+export PATH=~/.npm-global/bin:$PATH
+source ~/.zprofile
+npm install
+
+
+-------------------------------------
+第六步：打包 Mac 应用
+-------------------------------------
+npm run build:mac-arm
+
+这个过程分三步：
+1. prettier 格式化代码（几秒）
+2. vite build 前端构建（约 30 秒）
+3. electron-builder 打包（约 3-5 分钟，需要下载 Electron 二进制文件）
+
+
+-------------------------------------
+第七步：获取安装包
+-------------------------------------
+打包完成后，安装包在：
+
+ls -la dist-release/
+
+你会看到：
+- AiAvatar-1.0.0-mac-arm64.dmg    ← 这就是安装包（M1/M2/M3/M4 用这个）
+- AiAvatar-1.0.0-mac-x64.dmg      ← Intel 版（可以删掉）
+
+把 .dmg 拷到 U 盘或 AirDrop 发给需要的设备即可。
+
+
+=====================================
+常见问题处理
+=====================================
+
+问题 1：npm install 卡住或超时
+npm config set registry https://registry.npmmirror.com
+npm install
+
+问题 2：electron-builder 下载 Electron 超时
+export ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
+npm run build:mac-arm
+
+问题 3：打包时报签名错误
+CSC_IDENTITY_AUTO_DISCOVERY=false npm run build:mac-arm
+
+
+=====================================
+一键脚本（懒人版）
+=====================================
+把下面整段粘贴到终端执行：
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+brew install node@20 git
+cd ~
+git clone https://gitee.com/Spacetime-Ripple/ai-avatar.git
+cd ai-avatar
+npm config set registry https://registry.npmmirror.com
+export ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
+npm install
+CSC_IDENTITY_AUTO_DISCOVERY=false npm run build:mac-arm
+echo "========================================="
+echo "打包完成！安装包在："
+ls -la dist-release/*.dmg
+echo "========================================="
+
+整个流程约 15-20 分钟（取决于网速）。
+
+
+=====================================
+安装说明
+=====================================
+1. 双击 .dmg 文件
+2. 把 AiAvatar 拖到 Applications 文件夹
+3. 首次打开时，macOS 会提示"无法打开，因为来自身份不明的开发者"
+4. 解决方法：右键点击应用 → 选择"打开" → 弹窗点击"打开"
+5. 操作一次后就不会再拦截了

@@ -1,5 +1,6 @@
 # CLAUDE.md
 
+每次对话都要叫我“皇上”，每次对话结束都要喊“吾皇，万岁万岁万万岁！”
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
